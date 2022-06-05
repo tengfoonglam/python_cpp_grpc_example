@@ -11,3 +11,6 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/../arithmetic_proto" build_arithmetic_pr
 
 add_subdirectory(src)
 add_subdirectory(apps)
+
+enable_testing() # Enable ctest for the project
+add_subdirectory(tests)
