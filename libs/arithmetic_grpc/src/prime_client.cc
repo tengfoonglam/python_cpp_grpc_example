@@ -31,14 +31,20 @@ PerformPrimeNumberDecompositionClient::PerformPrimeNumberDecomposition(
 
   PerformPrimeNumberDecompositionResponse response;
 
-  std::cout << "Streaming answer...";
+  std::cout << "Attempting to stream answer...";
   while (reader_ptr->Read(&response)) {
     answer.push_back(response.factor());
     std::cout << response.factor() << "...";
   }
-  std::cout << "Done!" << std::endl;
 
   const Status status = reader_ptr->Finish();
+  if (!status.ok()) {
+    std::cout << "Prime decomposition server-side streaming failed"
+              << std::endl;
+  } else {
+    std::cout << "Prime decomposition server-side streaming completed"
+              << std::endl;
+  }
 
   return answer;
 }

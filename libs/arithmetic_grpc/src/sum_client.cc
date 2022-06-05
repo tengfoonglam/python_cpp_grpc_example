@@ -35,8 +35,8 @@ float SumClient::Sum(float a, float b) {
   if (status.ok()) {
     return response.answer();
   } else {
-    std::cout << status.error_code() << ": " << status.error_message()
-              << std::endl;
+    std::cout << "Sum service faild with error code " << status.error_code()
+              << ": " << status.error_message() << std::endl;
     return std::nanf("");
   }
 }

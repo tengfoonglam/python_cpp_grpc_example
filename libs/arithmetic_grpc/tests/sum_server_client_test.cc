@@ -11,8 +11,7 @@ class SumClientServerTests
     : public ::testing::TestWithParam<std::tuple<float, float, float>> {
  protected:
   void SetUp() {
-    server_ptr_ =
-        CreateServerAndAttachService(DEFAULT_GRPC_ADDRESS, sum_service_);
+    server_ptr_ = CreateServerAndAttachService(DEFAULT_GRPC_ADDRESS, service_);
   }
 
   void TearDown() {
@@ -24,7 +23,7 @@ class SumClientServerTests
   }
 
  private:
-  SumServiceImpl sum_service_;
+  SumServiceImpl service_;
   std::unique_ptr<Server> server_ptr_;
 };
 
@@ -36,14 +35,14 @@ TEST_P(SumClientServerTests, SumNormalOperations) {
   ASSERT_FLOAT_EQ(answer, output);
 }
 
-INSTANTIATE_TEST_CASE_P(ArithmeticGrpcTest, SumClientServerTests,
+INSTANTIATE_TEST_CASE_P(ArithmeticGrpcSumTest, SumClientServerTests,
                         ::testing::Values(std::make_tuple(0, 0, 0),
                                           std::make_tuple(-1, -2, -3),
                                           std::make_tuple(1, 2, 3),
                                           std::make_tuple(1, -2, -1),
                                           std::make_tuple(-1, 2, 1)));
 
-TEST(ArithmeticGrpcTest, SumServerNotWorking) {
+TEST(ArithmeticGrpcSumTest, SumServerNotWorking) {
   SumClient client(grpc::CreateChannel(DEFAULT_GRPC_ADDRESS,
                                        grpc::InsecureChannelCredentials()));
   const auto output = client.Sum(0, 0);
