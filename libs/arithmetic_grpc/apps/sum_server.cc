@@ -7,9 +7,11 @@
 using namespace arithmetic_grpc;
 
 int main(int argc, char** argv) {
-  const std::vector<std::string> argumentList(argv + 1, argv + argc);
-  const std::string address =
-      (argumentList.size() == 1) ? argumentList.front() : DEFAULT_GRPC_ADDRESS;
-  RunServer(address, std::make_unique<SumServiceImpl>());
+  const std::vector<std::string> argument_list(argv + 1, argv + argc);
+  const std::string address = (argument_list.size() == 1)
+                                  ? argument_list.front()
+                                  : DEFAULT_GRPC_ADDRESS;
+  SumServiceImpl service;
+  CreateServerAndAttachServiceThenWait(address, service);
   return 0;
 }

@@ -13,19 +13,26 @@ namespace arithmetic_grpc {
 
 using grpc::Server;
 using grpc::ServerBuilder;
+using grpc::Service;
 
 const std::string DEFAULT_GRPC_ADDRESS{"0.0.0.0:50051"};
 
-void inline RunServer(const std::string& address,
-                      std::unique_ptr<grpc::Service> service_ptr) {
+std::unique_ptr<Server> inline CreateServerAndAttachService(
+    const std::string& address, Service& service) {
   grpc::EnableDefaultHealthCheckService(true);
   grpc::reflection::InitProtoReflectionServerBuilderPlugin();
   ServerBuilder builder;
   builder.AddListeningPort(address, grpc::InsecureServerCredentials());
-  builder.RegisterService(service_ptr.release());
-  std::unique_ptr<Server> server(builder.BuildAndStart());
+  builder.RegisterService(&service);
+  std::unique_ptr<Server> server_ptr(builder.BuildAndStart());
   std::cout << "Server listening on " << address << std::endl;
-  server->Wait();
+  return server_ptr;
+}
+
+void inline CreateServerAndAttachServiceThenWait(const std::string& address,
+                                                 Service& service) {
+  auto server_ptr = CreateServerAndAttachService(address, service);
+  server_ptr->Wait();
 }
 
 }  // namespace arithmetic_grpc
