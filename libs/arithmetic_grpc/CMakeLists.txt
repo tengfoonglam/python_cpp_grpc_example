@@ -10,4 +10,4 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/../arithmetic" build_arithmetic)
 add_subdirectory("${PROJECT_SOURCE_DIR}/../arithmetic_proto" build_arithmetic_proto)
 
 add_subdirectory(src)
-#add_subdirectory(apps)
+add_subdirectory(apps)

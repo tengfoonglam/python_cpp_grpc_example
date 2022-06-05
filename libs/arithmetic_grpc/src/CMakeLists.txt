@@ -1,5 +1,6 @@
 set(HEADER_LIST
 "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/average_service.h"
+"${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/grpc_utils.h"
 "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/sum_client.h"
 "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/sum_service.h"
 "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/prime_client.h"
