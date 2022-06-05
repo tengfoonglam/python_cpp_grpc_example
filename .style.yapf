@@ -1,0 +1,16 @@
+[style]
+# YAPF uses the chromium style
+based_on_style = pep8
+spaces_before_comment = 4
+split_before_logical_operator = true
+ALIGN_CLOSING_BRACKET_WITH_VISUAL_INDENT = false
+# ARITHMETIC_PRECEDENCE_INDICATION = true
+COLUMN_LIMIT = 120
+SPLIT_ARGUMENTS_WHEN_COMMA_TERMINATED = true
+INDENT_DICTIONARY_VALUE = true
+EACH_DICT_ENTRY_ON_SEPARATE_LINE = true
+SPACE_BETWEEN_ENDING_COMMA_AND_CLOSING_BRACKET: 0
+join_multiple_lines: 0
+dedent_closing_brackets: 0
+COALESCE_BRACKETS = false
+#SPLIT_ALL_COMMA_SEPARATED_VALUES = true
