@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package arithmetic;
+
+message MaxRequest
+{
+    int64 number = 1;
+}
+
+message MaxResponse
+{
+    int64 max = 1;
+}
+
+service MaxService
+{
+    rpc Max(stream MaxRequest) returns (stream MaxResponse){};
+}

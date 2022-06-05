@@ -1,0 +1,18 @@
+syntax = "proto3"; // Set to proto2 if you are using Protocol Buffer Version 2
+
+package arithmetic;
+
+message PerformPrimeNumberDecompositionRequest
+{
+    uint64 number = 1;
+}
+
+message PerformPrimeNumberDecompositionResponse
+{
+    uint64 factor = 1;
+}
+
+service PerformPrimeNumberDecompositionService
+{
+    rpc PerformPrimeNumberDecomposition(PerformPrimeNumberDecompositionRequest) returns (stream PerformPrimeNumberDecompositionResponse){};
+}
