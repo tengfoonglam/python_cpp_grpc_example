@@ -39,8 +39,9 @@ PerformPrimeNumberDecompositionClient::PerformPrimeNumberDecomposition(
 
   const Status status = reader_ptr->Finish();
   if (!status.ok()) {
-    std::cout << "Prime decomposition server-side streaming failed"
-              << std::endl;
+    std::cout
+        << "Prime decomposition server-side streaming failed with error code "
+        << status.error_code() << ": " << status.error_message() << std::endl;
   } else {
     std::cout << "Prime decomposition server-side streaming completed"
               << std::endl;

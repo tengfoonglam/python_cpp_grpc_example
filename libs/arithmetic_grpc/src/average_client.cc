@@ -25,9 +25,10 @@ bool AverageClient::AddNumber(std::int32_t number) {
   request.set_number(number);
 
   if (writer_ptr_->Write(request)) {
+    std::cout << "Added number " << number << " to be averaged" << std::endl;
     success = true;
   } else {
-    std::cout << "Broken stream!" << std::endl;
+    std::cout << "Failed to add number" << std::endl;
     writer_ptr_.reset();
   }
 
@@ -35,18 +36,24 @@ bool AverageClient::AddNumber(std::int32_t number) {
 }
 
 std::pair<bool, float> AverageClient::ComputeAverage() {
-  std::pair<bool, float> answer{false, 0.0f};
+  std::pair<bool, float> output{false, 0.0f};
 
   if (writer_ptr_) {
     writer_ptr_->WritesDone();
     Status status = writer_ptr_->Finish();
     if (status.ok()) {
-      answer = std::make_pair(true, response_ptr_->answer());
+      const auto answer = response_ptr_->answer();
+      output = std::make_pair(true, answer);
+      std::cout << "Average received from server: " << answer << std::endl;
+    } else {
+      std::cout
+          << "Average client-side RPC streaming service failed with error code "
+          << status.error_code() << ": " << status.error_message() << std::endl;
     }
     writer_ptr_.reset();
   }
 
-  return answer;
+  return output;
 }
 
 AverageClient::~AverageClient() {

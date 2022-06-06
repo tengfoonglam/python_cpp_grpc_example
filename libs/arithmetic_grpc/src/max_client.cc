@@ -60,7 +60,9 @@ std::pair<bool, std::int64_t> MaxClient::GetMax(
   Status status = stream_ptr->Finish();
   if (!status.ok()) {
     output.first = false;
-    std::cout << "Max bi-direction RPC service failed." << std::endl;
+    std::cout << "Max bi-direction RPC service failed with error code "
+              << status.error_code() << ": " << status.error_message()
+              << std::endl;
   } else {
     std::cout << "Final max: " << output.second << std::endl;
   }
