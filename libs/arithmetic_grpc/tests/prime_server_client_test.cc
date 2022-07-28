@@ -12,8 +12,7 @@ class PrimeClientServerTests
           std::pair<std::uint64_t, std::vector<std::uint64_t>>> {
  protected:
   void SetUp() {
-    server_ptr_ =
-        CreateServerAndAttachService(DEFAULT_GRPC_ADDRESS, prime_service_);
+    server_ptr_ = CreateServerAndAttachService(DEFAULT_GRPC_ADDRESS, service_);
   }
 
   void TearDown() {
@@ -25,7 +24,7 @@ class PrimeClientServerTests
   }
 
  private:
-  PerformPrimeNumberDecompositionServiceImpl prime_service_;
+  PerformPrimeNumberDecompositionServiceImpl service_;
   std::unique_ptr<Server> server_ptr_;
 };
 

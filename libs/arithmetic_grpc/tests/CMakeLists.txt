@@ -7,6 +7,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 set(TEST_SRCS
+  average_server_client_test.cc
   sum_server_client_test.cc
   prime_server_client_test.cc
 )

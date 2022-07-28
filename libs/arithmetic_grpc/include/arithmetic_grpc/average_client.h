@@ -21,7 +21,7 @@ using grpc::ClientWriter;
 class AverageClient {
  public:
   AverageClient(std::shared_ptr<Channel> channel);
-  bool AddNumber(std::int32_t number);
+  bool AddNumber(const std::int32_t number);
   std::pair<bool, float> ComputeAverage();
   ~AverageClient();
 
@@ -33,6 +33,7 @@ class AverageClient {
   std::unique_ptr<ClientWriter<AverageRequest>> writer_ptr_;
   ClientContext* context_ptr_;
   AverageResponse* response_ptr_;
+  void Cleanup();
 };
 
 }  // namespace arithmetic_grpc

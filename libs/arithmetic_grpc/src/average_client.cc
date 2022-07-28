@@ -12,7 +12,7 @@ using grpc::Status;
 AverageClient::AverageClient(std::shared_ptr<Channel> channel)
     : stub_ptr_(AverageService::NewStub(channel)) {}
 
-bool AverageClient::AddNumber(std::int32_t number) {
+bool AverageClient::AddNumber(const std::int32_t number) {
   bool success = false;
 
   if (!writer_ptr_) {
@@ -28,8 +28,8 @@ bool AverageClient::AddNumber(std::int32_t number) {
     std::cout << "Added number " << number << " to be averaged" << std::endl;
     success = true;
   } else {
-    std::cout << "Failed to add number" << std::endl;
-    writer_ptr_.reset();
+    std::cout << "Failed to add number, resetting client" << std::endl;
+    Cleanup();
   }
 
   return success;
@@ -40,7 +40,7 @@ std::pair<bool, float> AverageClient::ComputeAverage() {
 
   if (writer_ptr_) {
     writer_ptr_->WritesDone();
-    Status status = writer_ptr_->Finish();
+    const auto status = writer_ptr_->Finish();
     if (status.ok()) {
       const auto answer = response_ptr_->answer();
       output = std::make_pair(true, answer);
@@ -50,15 +50,20 @@ std::pair<bool, float> AverageClient::ComputeAverage() {
           << "Average client-side RPC streaming service failed with error code "
           << status.error_code() << ": " << status.error_message() << std::endl;
     }
-    writer_ptr_.reset();
+    Cleanup();
   }
 
   return output;
 }
 
-AverageClient::~AverageClient() {
-  delete context_ptr_;
-  delete response_ptr_;
+void AverageClient::Cleanup() {
+  if (writer_ptr_) {
+    writer_ptr_.reset();
+    delete context_ptr_;
+    delete response_ptr_;
+  }
 }
+
+AverageClient::~AverageClient() { Cleanup(); }
 
 }  // namespace arithmetic_grpc
