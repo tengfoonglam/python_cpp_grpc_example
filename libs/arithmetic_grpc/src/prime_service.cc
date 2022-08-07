@@ -19,8 +19,8 @@ PerformPrimeNumberDecompositionServiceImpl::PerformPrimeNumberDecomposition(
     const PerformPrimeNumberDecompositionRequest* request_ptr,
     ServerWriter<PerformPrimeNumberDecompositionResponse>*
         response_writer_ptr) {
-  auto number_to_process = request_ptr->number();
-  auto prime_numbers =
+  const auto number_to_process = request_ptr->number();
+  const auto prime_numbers =
       arithmetic::GetPrimeNumberDecomposition(number_to_process);
   for (const auto prime_number : prime_numbers) {
     PerformPrimeNumberDecompositionResponse response;

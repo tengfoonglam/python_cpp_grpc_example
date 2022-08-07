@@ -9,7 +9,7 @@ namespace arithmetic_grpc {
 Status MaxServiceImpl::Max(
     __attribute__((unused)) ServerContext* context_ptr,
     ServerReaderWriter<MaxResponse, MaxRequest>* stream_ptr) {
-  std::int64_t max = INT64_MIN;
+  const std::int64_t max = INT64_MIN;
   MaxRequest current_request;
   while (stream_ptr->Read(&current_request)) {
     if (arithmetic::UpdateMax(max, current_request.number())) {
