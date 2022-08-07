@@ -1,7 +1,6 @@
 #include "arithmetic_grpc/max_client.h"
 
 #include <chrono>
-#include <limits>
 #include <memory>
 #include <thread>
 
@@ -20,8 +19,12 @@ MaxClient::MaxClient(std::shared_ptr<Channel> channel)
 
 std::pair<bool, std::int64_t> MaxClient::GetMax(
     const std::vector<std::int64_t>& numbers) {
-  std::pair<bool, std::int64_t> output{
-      false, std::numeric_limits<std::int64_t>::quiet_NaN()};
+  auto output = MAX_FAILURE_MESSAGE;
+
+  // Guard clause: If empty vector provided as input, return immediately
+  if (numbers.empty()) {
+    return output;
+  }
 
   // This was adapted from official Routing Guide Client Example
   // Source:
@@ -34,6 +37,7 @@ std::pair<bool, std::int64_t> MaxClient::GetMax(
   std::shared_ptr<ClientReaderWriter<MaxRequest, MaxResponse>> stream_ptr =
       stub_ptr_->Max(&context);
 
+  // Write requests in a separate thread
   std::thread writer([stream_ptr, numbers]() {
     for (const auto number : numbers) {
       std::cout << "Sending number to be maxed: " << number << std::endl;
@@ -41,12 +45,13 @@ std::pair<bool, std::int64_t> MaxClient::GetMax(
       request.set_number(number);
       stream_ptr->Write(request);
       std::this_thread::sleep_for(std::chrono::milliseconds(
-          250));  // So you can see sequence of requests and responses more
+          100));  // So you can see sequence of requests and responses more
                   // clearly
     }
     stream_ptr->WritesDone();
   });
 
+  // Receive and print out reponses while requests are being sent out
   MaxResponse response;
   while (stream_ptr->Read(&response)) {
     const auto max = response.max();

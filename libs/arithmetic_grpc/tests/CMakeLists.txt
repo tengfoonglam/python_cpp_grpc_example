@@ -8,8 +8,9 @@ FetchContent_MakeAvailable(googletest)
 
 set(TEST_SRCS
   average_server_client_test.cc
-  sum_server_client_test.cc
+  max_server_client_test.cc
   prime_server_client_test.cc
+  sum_server_client_test.cc
 )
 
 add_executable(test_arithmetic_grpc ${TEST_SRCS})
