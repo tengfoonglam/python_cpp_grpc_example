@@ -11,7 +11,7 @@ class SumClientServerTests
     : public ::testing::TestWithParam<std::tuple<float, float, float>> {
  protected:
   void SetUp() {
-    server_ptr_ = CreateServerAndAttachService(DEFAULT_GRPC_ADDRESS, service_);
+    server_ptr_ = CreateServerAndAttachService(DEFAULT_GRPC_ADDRESS, &service_);
   }
 
   void TearDown() {

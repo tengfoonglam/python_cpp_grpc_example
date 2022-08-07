@@ -13,7 +13,7 @@ class AverageClientServerTests
           std::tuple<std::vector<std::int32_t>, float, bool>> {
  protected:
   void SetUp() {
-    server_ptr_ = CreateServerAndAttachService(DEFAULT_GRPC_ADDRESS, service_);
+    server_ptr_ = CreateServerAndAttachService(DEFAULT_GRPC_ADDRESS, &service_);
   }
 
   void TearDown() {

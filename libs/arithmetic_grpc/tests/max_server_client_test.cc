@@ -15,7 +15,7 @@ class MaxClientServerTests
           std::tuple<std::vector<std::int64_t>, bool, std::int64_t>> {
  protected:
   void SetUp() {
-    server_ptr_ = CreateServerAndAttachService(DEFAULT_GRPC_ADDRESS, service_);
+    server_ptr_ = CreateServerAndAttachService(DEFAULT_GRPC_ADDRESS, &service_);
   }
 
   void TearDown() {

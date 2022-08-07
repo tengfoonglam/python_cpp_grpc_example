@@ -12,6 +12,6 @@ int main(int argc, char** argv) {
                                   ? argument_list.front()
                                   : DEFAULT_GRPC_ADDRESS;
   SumServiceImpl service;
-  CreateServerAndAttachServiceThenWait(address, service);
+  CreateServerAndAttachServiceThenWait(address, &service);
   return 0;
 }
