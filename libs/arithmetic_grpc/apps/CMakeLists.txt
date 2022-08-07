@@ -19,5 +19,8 @@ target_link_libraries(interactive_prime_client ${PROJECT_NAME})
 add_executable(max_server max_server.cc)
 target_link_libraries(max_server ${PROJECT_NAME})
 
+add_executable(arithmetic_server arithmetic_server.cc)
+target_link_libraries(arithmetic_server ${PROJECT_NAME})
+
 add_executable(interactive_max_client interactive_max_client.cc)
 target_link_libraries(interactive_max_client ${PROJECT_NAME})
