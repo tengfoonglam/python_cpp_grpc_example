@@ -1,6 +1,6 @@
 syntax = "proto3"; // Set to proto2 if you are using Protocol Buffer Version 2
 
-package arithmetic;
+package arithmetic_proto;
 
 message PerformPrimeNumberDecompositionRequest
 {

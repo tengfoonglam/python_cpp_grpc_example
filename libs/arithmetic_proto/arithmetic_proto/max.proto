@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package arithmetic;
+package arithmetic_proto;
 
 message MaxRequest
 {
