@@ -1,0 +1,4 @@
+.venv/
+**/.git
+**/build
+.pytest_cache
