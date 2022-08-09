@@ -21,7 +21,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 
 WORKDIR /
 
-# Install gRPC
 COPY scripts/install_grpc.sh scripts/install_grpc.sh
 RUN /bin/bash -c "source scripts/install_grpc.sh"
 
