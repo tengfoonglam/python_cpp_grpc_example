@@ -1,4 +1,4 @@
-# Stage 1: Base image with basic dependencies and gRPC
+# Base image with basic dependencies and gRPC
 FROM ubuntu:20.04 AS python_cpp_grpc_base
 
 ARG DEBIAN_FRONTEND=noninteractive
