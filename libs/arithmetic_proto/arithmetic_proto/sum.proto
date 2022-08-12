@@ -2,11 +2,6 @@ syntax = "proto3"; // Set to proto2 if you are using Protocol Buffer Version 2
 
 package arithmetic_proto;
 
-service SumService
-{
-    rpc Sum(SumRequest) returns (SumResponse) {};
-}
-
 message SumRequest
 {
     float number_1 = 1;
@@ -16,4 +11,9 @@ message SumRequest
 message SumResponse
 {
     float answer = 1;
+}
+
+service SumService
+{
+    rpc Sum(SumRequest) returns (SumResponse) {};
 }

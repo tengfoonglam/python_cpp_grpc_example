@@ -20,5 +20,6 @@ pushd $DIR/..
 
   echo "Installing arithmetic_python_client..."
   pip install -r ./libs/arithmetic_python_client/requirements.txt
+  pip install -e ./libs/arithmetic_python_client
 
 popd

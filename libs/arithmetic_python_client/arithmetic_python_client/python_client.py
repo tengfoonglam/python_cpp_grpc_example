@@ -8,7 +8,7 @@ T = TypeVar('T')
 
 class PythonClient(Generic[T]):
     @staticmethod
-    def _return_none_if_exception_caught(function: Callable) -> Callable:
+    def return_none_if_exception_caught(function: Callable) -> Callable:
         def wrapper() -> Optional[Callable]:
             method_name = getattr(function, '__name__', repr(callable))
             try:
@@ -23,7 +23,7 @@ class PythonClient(Generic[T]):
 
     def __init__(self) -> None:
         self._channel: Optional[grpc.Channel] = None
-        self._stub: Optional[T] = None
+        self._stub = None
 
     @staticmethod
     def _create_stub(channel: grpc.Channel) -> Optional[T]:
