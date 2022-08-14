@@ -13,6 +13,9 @@ using namespace arithmetic_grpc;
 class MaxClientServerTests
     : public ::testing::TestWithParam<
           std::tuple<std::vector<std::int64_t>, bool, std::int64_t>> {
+ public:
+  static constexpr std::uint64_t SIMULATED_WRITE_TIME_MS{10};
+
  protected:
   void SetUp() {
     server_ptr_ = CreateServerAndAttachService(DEFAULT_GRPC_ADDRESS, &service_);
@@ -34,7 +37,8 @@ class MaxClientServerTests
 TEST_P(MaxClientServerTests, MaxNormalOperations) {
   const auto [numbers_to_max, expected_success, answer] = GetParam();
   MaxClient client(grpc::CreateChannel(DEFAULT_GRPC_ADDRESS,
-                                       grpc::InsecureChannelCredentials()));
+                                       grpc::InsecureChannelCredentials()),
+                   SIMULATED_WRITE_TIME_MS);
   const auto [success, output] = client.GetMax(numbers_to_max);
   ASSERT_EQ(success, expected_success);
   ASSERT_EQ(output, answer);
@@ -61,7 +65,8 @@ INSTANTIATE_TEST_CASE_P(
 
 TEST(ArithmeticMaxGrpcTest, MaxServerNotWorking) {
   MaxClient client(grpc::CreateChannel(DEFAULT_GRPC_ADDRESS,
-                                       grpc::InsecureChannelCredentials()));
+                                       grpc::InsecureChannelCredentials()),
+                   MaxClientServerTests::SIMULATED_WRITE_TIME_MS);
   const std::vector<std::int64_t> valid_input{0, 1, 3};
   const auto [success, output] = client.GetMax(valid_input);
   ASSERT_FALSE(success);

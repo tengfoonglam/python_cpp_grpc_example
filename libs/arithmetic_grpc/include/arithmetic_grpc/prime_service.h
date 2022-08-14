@@ -18,11 +18,17 @@ using grpc::Status;
 class PerformPrimeNumberDecompositionServiceImpl final
     : public PerformPrimeNumberDecompositionService::Service {
  public:
+  PerformPrimeNumberDecompositionServiceImpl(
+      std::uint64_t simulated_processing_time_ms = 200);
+
   Status PerformPrimeNumberDecomposition(
       __attribute__((unused)) ServerContext* context_ptr,
       const PerformPrimeNumberDecompositionRequest* request_ptr,
       ServerWriter<PerformPrimeNumberDecompositionResponse>*
           response_writer_ptr) override;
+
+ private:
+  const std::uint64_t simulated_processing_time_ms_;
 };
 
 }  // namespace arithmetic_grpc
