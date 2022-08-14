@@ -54,9 +54,8 @@ PerformPrimeNumberDecompositionServiceImpl::PerformPrimeNumberDecomposition(
     }
   }
 
-  std::cout
-      << "Perform Prime Number Decomposition Service requested for number: "
-      << number_to_process << std::endl;
+  std::cout << "Completed Prime Number Decomposition Service for number: "
+            << number_to_process << std::endl;
 
   return success ? Status::OK : Status::CANCELLED;
 }

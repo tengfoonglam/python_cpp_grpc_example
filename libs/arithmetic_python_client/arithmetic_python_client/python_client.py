@@ -32,7 +32,7 @@ class PythonClient(Generic[T]):
     def is_grpc_active(self) -> bool:
         return self._channel is not None and self._stub is not None
 
-    def open_grpc(self, ip_addr: str = "0.0.0.0", port: str = "50051") -> bool:
+    def open(self, ip_addr: str = "0.0.0.0", port: str = "50051") -> bool:
         address_with_port = f"{ip_addr}:{port}"
         logging.info(f"Connecting to {address_with_port}")
         self._channel = self._create_connect_channel(address_with_port)
@@ -60,7 +60,7 @@ class PythonClient(Generic[T]):
 
         return channel
 
-    def close_grpc(self) -> bool:
+    def close(self) -> bool:
 
         if self._channel is not None:
             try:

@@ -9,7 +9,7 @@ def interactive_sum() -> None:
 
     try:
         client = SumClient()
-        success = client.open_grpc()
+        success = client.open()
         if not success:
             logging.error("Failed to open gRPC channel")
             raise SystemExit(1)
@@ -26,7 +26,7 @@ def interactive_sum() -> None:
             else:
                 logging.error(f"Failed to obtain answer for sum {number_1} + {number_2}")
     except KeyboardInterrupt:
-        client.close_grpc()
+        client.close()
         try:
             sys.exit(0)
         except SystemExit:
@@ -34,6 +34,5 @@ def interactive_sum() -> None:
 
 
 if __name__ == "__main__":
-    FORMAT = ' (%(filename)s:%(lineno)d): %(message)s'
-    logging.basicConfig(level=logging.INFO, format=FORMAT)
+    logging.basicConfig(level=logging.INFO)
     interactive_sum()
