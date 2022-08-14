@@ -30,7 +30,10 @@ def interactive_prime() -> None:
             logging.error("Failed to open gRPC channel")
             raise SystemExit(1)
 
+        logging.info("Prime Client successfully opened")
+
         while (True):
+            answer.clear()
             number = int(input("Number to perform prime number decomposition: "))
             start_success = client.perform_prime_number_decomposition(number=number)
             if start_success:
