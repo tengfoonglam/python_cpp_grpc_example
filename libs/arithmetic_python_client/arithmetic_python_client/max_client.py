@@ -1,6 +1,5 @@
 import grpc
 import logging
-import time
 
 from arithmetic_python_client.prime_client import PythonClient
 
@@ -17,7 +16,6 @@ class MaxClient(PythonClient[max_grpc.MaxServiceStub]):
     @staticmethod
     def _get_generator(numbers: List[int]) -> Generator[max_proto.MaxRequest, None, None]:
         for number in numbers:
-            time.sleep(1.0)
             logging.info(f"Adding {number} into max computation")
             request = max_proto.MaxRequest(number=number)
             yield request
