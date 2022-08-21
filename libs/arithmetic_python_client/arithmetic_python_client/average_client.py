@@ -5,7 +5,7 @@ from arithmetic_python_client.python_client import PythonClient
 
 from arithmetic_proto import average_pb2_grpc as average_grpc
 from arithmetic_proto import average_pb2 as average_proto
-from typing import Generator, List
+from typing import Generator, List, Optional
 
 
 class AverageClient(PythonClient[average_grpc.AverageServiceStub]):
@@ -16,7 +16,7 @@ class AverageClient(PythonClient[average_grpc.AverageServiceStub]):
     @staticmethod
     def _get_generator(numbers: List[int]) -> Generator[average_proto.AverageRequest, None, None]:
         for number in numbers:
-            logging.info(f"Adding {number} into computation")
+            logging.info(f"Adding {number} into average computation")
             request = average_proto.AverageRequest(number=number)
             yield request
 
@@ -24,9 +24,12 @@ class AverageClient(PythonClient[average_grpc.AverageServiceStub]):
     # So if you want to add numbers over time instead of adding them as an entire list
     # in one go you would need the asynchronous gRPC API,
     # See https://github.com/grpc/grpc/blob/v1.46.3/examples/python/route_guide/asyncio_route_guide_client.py
-    def average(self, numbers: List[int]) -> float:
+    def average(self, numbers: List[int]) -> Optional[float]:
         if not self.is_grpc_active():
-            return False
+            return None
+
+        if len(numbers) == 0:
+            return None
 
         @PythonClient.return_none_if_exception_caught
         def attempt_average() -> float:
