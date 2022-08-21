@@ -2,10 +2,11 @@ import grpc
 import logging
 
 from arithmetic_python_client.prime_client import PythonClient
+from arithmetic_python_client.server_stream_handler import ServerStreamHandler
 
 from arithmetic_proto import max_pb2_grpc as max_grpc
 from arithmetic_proto import max_pb2 as max_proto
-from typing import Generator, List, Optional
+from typing import Callable, Generator, List, Optional
 
 
 class MaxClient(PythonClient[max_grpc.MaxServiceStub]):
@@ -13,35 +14,44 @@ class MaxClient(PythonClient[max_grpc.MaxServiceStub]):
     def _create_stub(channel: grpc.Channel) -> max_grpc.MaxServiceStub:
         return max_grpc.MaxServiceStub(channel)
 
+    def __init__(self) -> None:
+        super().__init__()
+        self._stream_handler: ServerStreamHandler = ServerStreamHandler(stream_name="Max")
+        self._stream_handler.set_initialize_stream_function(func=lambda request: self._stub.Max(request))
+
     @staticmethod
-    def _get_generator(numbers: List[int]) -> Generator[max_proto.MaxRequest, None, None]:
-        for number in numbers:
+    def _get_request_generator(
+            input_generator: Generator[int, None, None]) -> Generator[max_proto.MaxRequest, None, None]:
+        for number in input_generator:
             logging.info(f"Adding {number} into max computation")
             request = max_proto.MaxRequest(number=number)
             yield request
 
-    # Note: For synchronous bi-directional gRPC streaming, similar to client-side streaming,
-    # the gRPC call is blocking so if you want to send numbers over time instead of sending them as an entire list
-    # while receiving replies in real time you would need the asynchronous gRPC API,
-    # See https://github.com/grpc/grpc/blob/v1.46.3/examples/python/route_guide/asyncio_route_guide_client.py
-    def max(self, numbers: List[int]) -> Optional[int]:
+    def set_new_response_callback(self, callback: Callable) -> None:
+        self._stream_handler.set_new_response_callback(callback=lambda response: callback(max=response.max))
+
+    def set_completed_callback(self, callback: Callable) -> None:
+        self._stream_handler.set_completed_callback(callback=callback)
+
+    def is_processing(self) -> bool:
+        return self._stream_handler.is_processing()
+
+    def cancel(self) -> None:
+        self._stream_handler.cancel()
+
+    def wait_till_completion(self) -> None:
+        self._stream_handler.wait_till_completion()
+
+    def close(self) -> bool:
+        self._stream_handler.close()
+        return super().close()
+
+    def max(self, input_generator: Generator[int, None, None]) -> bool:
         if not self.is_grpc_active():
-            return None
+            return False
+        self._stream_handler.set_generate_request_function(
+            func=lambda: self._get_request_generator(input_generator=input_generator))
+        return self._stream_handler.start()
 
-        if len(numbers) == 0:
-            return None
-
-        @PythonClient.return_none_if_exception_caught
-        def attempt_max() -> int:
-            responses = self._stub.Max(self._get_generator(numbers=numbers))
-            answer = None
-            for response in responses:
-                answer = response.max
-                logging.info(f"Received max value from client: {answer}")
-            if answer is not None:
-                logging.info(f"Final max: {answer}")
-            else:
-                logging.info("Did not receive a max value, service could have been stopped/cancelled mid-way")
-            return answer
-
-        return attempt_max()
+    def max_list_of_numbers(self, numbers: List[int]) -> Optional[float]:
+        return self.max(input_generator=(i for i in numbers))

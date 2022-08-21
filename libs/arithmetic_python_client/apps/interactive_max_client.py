@@ -3,13 +3,31 @@ import os
 import sys
 
 from arithmetic_python_client import MaxClient
+from arithmetic_python_client.utils import get_terminal_input_generator
 
 
 def interactive_average() -> None:
 
     try:
         client = MaxClient()
+        answer = 0
+
+        def on_receive(max: int) -> None:
+            nonlocal answer
+            logging.info(f"Received new max: {max}")
+            answer = max
+
+        def on_completion(success: bool) -> None:
+            if success:
+                logging.info(f"Max: {answer}")
+            else:
+                logging.warning("Failed to compute max")
+
+        client.set_new_response_callback(callback=on_receive)
+        client.set_completed_callback(callback=on_completion)
+
         success = client.open()
+
         if not success:
             logging.error("Failed to open gRPC channel")
             raise SystemExit(1)
@@ -18,21 +36,13 @@ def interactive_average() -> None:
 
         while (True):
             numbers_to_max = []
-
-            collecting_input = True
-            while (collecting_input):
-                input_str = input("Number to max (leave empty to start computation):")
-                if len(input_str) == 0:
-                    break
-                else:
-                    numbers_to_max.append(int(input_str))
-
-            answer = client.max(numbers=numbers_to_max)
-
-            if answer is not None:
-                logging.info(f"Received answer: Max of {numbers_to_max} is {answer}")
+            start_success = client.max(input_generator=get_terminal_input_generator(
+                new_entry_callback=lambda new_entry: numbers_to_max.append(new_entry)))
+            if start_success:
+                client.wait_till_completion()
             else:
-                logging.error("Failed to obtain answer")
+                logging.warning("Failed to start max task")
+
     except KeyboardInterrupt:
         client.close()
         try:
