@@ -27,7 +27,7 @@ class PerformPrimeNumberDecompositionClient(PythonClient[prime_grpc.PerformPrime
         self._stream_handler.set_completed_callback(callback=callback)
 
     def perform_prime_number_decomposition(self, number: int) -> bool:
-        if not self.is_grpc_active():
+        if not self._channel_and_stubs_initialized():
             return False
         self._stream_handler.set_generate_request_function(
             func=lambda: prime_proto.PerformPrimeNumberDecompositionRequest(number=number))

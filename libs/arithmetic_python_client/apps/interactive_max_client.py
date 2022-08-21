@@ -34,7 +34,7 @@ def interactive_average() -> None:
 
         logging.info("Max Client successfully opened")
 
-        while (True):
+        while (client.is_grpc_active()):
             numbers_to_max = []
             start_success = client.max(input_generator=get_terminal_input_generator(
                 new_entry_callback=lambda new_entry: numbers_to_max.append(new_entry)))

@@ -28,7 +28,7 @@ class AverageClient(PythonClient[average_grpc.AverageServiceStub]):
             yield request
 
     def average(self, input_generator: Generator[int, None, None]) -> Optional[float]:
-        if not self.is_grpc_active():
+        if not self._channel_and_stubs_initialized():
             return None
 
         @PythonClient.return_none_if_exception_caught

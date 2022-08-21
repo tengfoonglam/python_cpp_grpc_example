@@ -16,7 +16,7 @@ def interactive_sum() -> None:
 
         logging.info("Sum Client successfully opened")
 
-        while (True):
+        while (client.is_grpc_active()):
             number_1 = float(input("First number to sum: "))
             number_2 = float(input("Second number to sum: "))
             answer = client.sum(number_1=number_1, number_2=number_2)

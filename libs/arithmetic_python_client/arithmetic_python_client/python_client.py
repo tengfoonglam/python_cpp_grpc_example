@@ -29,7 +29,7 @@ class PythonClient(Generic[T]):
     def _create_stub(channel: grpc.Channel) -> Optional[T]:
         return None
 
-    def is_grpc_active(self) -> bool:
+    def _channel_and_stubs_initialized(self) -> bool:
         return self._channel is not None and self._stub is not None
 
     def open(self, ip_addr: str = "0.0.0.0", port: str = "50051") -> bool:
@@ -39,7 +39,7 @@ class PythonClient(Generic[T]):
         logging.info(f"gRPC channel creation {'successful' if self._channel else 'unsuccessful'}")
         self._stub = self._create_stub(channel=self._channel) if self._channel else None
         logging.info(f"gRPC stub creation {'successful' if self._channel else 'unsuccessful'}")
-        return self.is_grpc_active()
+        return self._channel_and_stubs_initialized()
 
     def _create_connect_channel(self, address_with_port: str) -> Optional[grpc.Channel]:
 
@@ -71,10 +71,24 @@ class PythonClient(Generic[T]):
 
         self._stub = None
 
-        grpc_closed = not self.is_grpc_active()
+        grpc_closed = not self._channel_and_stubs_initialized()
         if grpc_closed:
             logging.info("gRPC channel closed successfully")
         else:
             logging.warn("gRPC channel failed to close")
 
         return grpc_closed
+
+    def is_grpc_active(self) -> bool:
+        if not self._channel_and_stubs_initialized():
+            logging.warning("No active gRPC connection.")
+            return False
+        active = False
+        try:
+            grpc.channel_ready_future(self._channel).result(timeout=0.5)
+            active = True
+        except grpc.FutureTimeoutError:
+            logging.error("gRPC connection lost. channel_ready_future timed out")
+        except Exception:
+            logging.exception("gRPC connection lost")
+        return active

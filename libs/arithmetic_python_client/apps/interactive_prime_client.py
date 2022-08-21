@@ -32,7 +32,7 @@ def interactive_prime() -> None:
 
         logging.info("Prime Client successfully opened")
 
-        while (True):
+        while (client.is_grpc_active()):
             answer.clear()
             number = int(input("Number to perform prime number decomposition: "))
             start_success = client.perform_prime_number_decomposition(number=number)

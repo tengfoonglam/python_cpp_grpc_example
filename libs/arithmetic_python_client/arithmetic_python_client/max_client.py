@@ -47,7 +47,7 @@ class MaxClient(PythonClient[max_grpc.MaxServiceStub]):
         return super().close()
 
     def max(self, input_generator: Generator[int, None, None]) -> bool:
-        if not self.is_grpc_active():
+        if not self._channel_and_stubs_initialized():
             return False
         self._stream_handler.set_generate_request_function(
             func=lambda: self._get_request_generator(input_generator=input_generator))

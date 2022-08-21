@@ -13,7 +13,7 @@ class SumClient(PythonClient[sum_grpc.SumServiceStub]):
         return sum_grpc.SumServiceStub(channel)
 
     def sum(self, number_1: float, number_2: float) -> Optional[float]:
-        if not self.is_grpc_active():
+        if not self._channel_and_stubs_initialized():
             return None
 
         @PythonClient.return_none_if_exception_caught
