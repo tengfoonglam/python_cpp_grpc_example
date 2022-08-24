@@ -36,7 +36,7 @@ def interactive_average() -> None:
 
         while (client.is_grpc_active()):
             numbers_to_max = []
-            start_success = client.max(input_generator=get_terminal_input_generator(
+            start_success = client.max(input_iterable=get_terminal_input_generator(
                 new_entry_callback=lambda new_entry: numbers_to_max.append(new_entry)))
             if start_success:
                 client.wait_till_completion()

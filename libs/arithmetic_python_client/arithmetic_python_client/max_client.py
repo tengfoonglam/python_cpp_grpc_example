@@ -6,7 +6,7 @@ from arithmetic_python_client.server_stream_handler import ServerStreamHandler
 
 from arithmetic_proto import max_pb2_grpc as max_grpc
 from arithmetic_proto import max_pb2 as max_proto
-from typing import Callable, Generator, List, Optional
+from typing import Callable, Generator, Iterable
 
 
 class MaxClient(PythonClient[max_grpc.MaxServiceStub]):
@@ -20,9 +20,8 @@ class MaxClient(PythonClient[max_grpc.MaxServiceStub]):
         self._stream_handler.set_initialize_stream_function(func=lambda request: self._stub.Max(request))
 
     @staticmethod
-    def _get_request_generator(
-            input_generator: Generator[int, None, None]) -> Generator[max_proto.MaxRequest, None, None]:
-        for number in input_generator:
+    def _get_request_generator(input_iterable: Iterable[int]) -> Generator[max_proto.MaxRequest, None, None]:
+        for number in input_iterable:
             logging.info(f"Adding {number} into max computation")
             request = max_proto.MaxRequest(number=number)
             yield request
@@ -46,12 +45,9 @@ class MaxClient(PythonClient[max_grpc.MaxServiceStub]):
         self._stream_handler.close()
         return super().close()
 
-    def max(self, input_generator: Generator[int, None, None]) -> bool:
+    def max(self, input_iterable: Iterable[int]) -> bool:
         if not self._channel_and_stubs_initialized():
             return False
         self._stream_handler.set_generate_request_function(
-            func=lambda: self._get_request_generator(input_generator=input_generator))
+            func=lambda: self._get_request_generator(input_iterable=input_iterable))
         return self._stream_handler.start()
-
-    def max_list_of_numbers(self, numbers: List[int]) -> Optional[float]:
-        return self.max(input_generator=(i for i in numbers))
