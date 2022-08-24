@@ -6,7 +6,7 @@ from arithmetic_python_client.python_client import PythonClient
 from arithmetic_proto import average_pb2_grpc as average_grpc
 from arithmetic_proto import average_pb2 as average_proto
 from threading import Event
-from typing import Callable, Generator, List, Optional
+from typing import Callable, Generator, Iterable, Optional
 
 
 class AverageClient(PythonClient[average_grpc.AverageServiceStub]):
@@ -20,23 +20,19 @@ class AverageClient(PythonClient[average_grpc.AverageServiceStub]):
         self._input_function: Callable = lambda: None
 
     @staticmethod
-    def _get_request_generator(
-            input_generator: Generator[int, None, None]) -> Generator[average_proto.AverageRequest, None, None]:
-        for number in input_generator:
+    def _get_request_generator(input_iterator: Iterable[int]) -> Generator[average_proto.AverageRequest, None, None]:
+        for number in input_iterator:
             logging.info(f"Adding {number} into average computation")
             request = average_proto.AverageRequest(number=number)
             yield request
 
-    def average(self, input_generator: Generator[int, None, None]) -> Optional[float]:
+    def average(self, input_iterator: Iterable[int]) -> Optional[float]:
         if not self._channel_and_stubs_initialized():
             return None
 
         @PythonClient.return_none_if_exception_caught
         def attempt_average() -> float:
-            response = self._stub.Average(self._get_request_generator(input_generator=input_generator))
+            response = self._stub.Average(self._get_request_generator(input_iterator=input_iterator))
             return response.answer
 
         return attempt_average()
-
-    def average_list_of_numbers(self, numbers: List[int]) -> Optional[float]:
-        return self.average(input_generator=(i for i in numbers))
