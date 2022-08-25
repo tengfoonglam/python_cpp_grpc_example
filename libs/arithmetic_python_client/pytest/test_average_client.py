@@ -26,9 +26,22 @@ def test_average_server_cancels(running_arithmetic_server: subprocess.Popen,
         running_arithmetic_server.terminate()
 
     server_termination_thread = Thread(target=terminate_server_with_delay, name="terminate average server with delay")
-
     server_termination_thread.start()
     output = open_average_client.average(input_iterable=list(range(1000000)))
     server_termination_thread.join()
 
     assert output is None
+
+
+def test_average_server_not_running(running_arithmetic_server: subprocess.Popen,
+                                    open_average_client: AverageClient) -> None:
+    running_arithmetic_server.terminate()
+    time.sleep(0.2)
+    assert open_average_client.is_grpc_active() is False
+    assert open_average_client.average(input_iterable=list(range(1000000))) is None
+
+
+def test_average_client_not_open(running_arithmetic_server: subprocess.Popen) -> None:
+    client = AverageClient()
+    assert client.is_grpc_active() is False
+    assert client.average(input_iterable=list(range(1000000))) is None
