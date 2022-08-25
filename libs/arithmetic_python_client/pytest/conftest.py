@@ -7,10 +7,12 @@ from typing import Callable, Generator, List, Optional, Tuple
 
 from arithmetic_python_client import AverageClient, MaxClient, PerformPrimeNumberDecompositionClient, SumClient
 
+ARITHMETIC_SERVER_PATH = "../arithmetic_grpc/build/apps/arithmetic_server"
+
 
 @pytest.fixture
 def running_arithmetic_server() -> Generator[subprocess.Popen, None, None]:
-    process = subprocess.Popen(args=["../arithmetic_grpc/build/apps/arithmetic_server"])
+    process = subprocess.Popen(args=[ARITHMETIC_SERVER_PATH])
     yield process
     process.terminate()
 
