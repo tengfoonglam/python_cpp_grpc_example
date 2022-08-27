@@ -1,10 +1,15 @@
 import pytest
 import subprocess
+import time
 
 from arithmetic_python_client import MaxClient
 
 from threading import Event
 from typing import Callable, Generator, List, Tuple
+
+
+def get_long_input_sequence_with_expected_response() -> List[Tuple[int, bool]]:
+    return [(i, True) for i in range(100000)]
 
 
 @pytest.mark.parametrize(
@@ -24,11 +29,22 @@ def test_max_normal_operations(running_arithmetic_server: subprocess.Popen,
     assert expect_success_event.is_set()
 
 
+def test_max_client_cancels(
+    running_arithmetic_server: subprocess.Popen, open_configured_max_client: Tuple[MaxClient, Event,
+                                                                                   Callable[[List[Tuple[int, bool]]],
+                                                                                            Generator[int, None, None]]]
+) -> None:
+    client, expect_success_event, input_generator = open_configured_max_client
+    assert client.max(input_iterable=input_generator(get_long_input_sequence_with_expected_response())) is True
+    assert client.is_processing() is True
+    time.sleep(0.5)
+    client.cancel()
+    assert client.is_processing() is False
+    client.wait_till_completion()
+    assert not expect_success_event.is_set()
+
+
 def test_max_server_cancels() -> None:
-    pass
-
-
-def test_max_client_cancels() -> None:
     pass
 
 

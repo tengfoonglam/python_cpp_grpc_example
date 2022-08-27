@@ -1,3 +1,4 @@
+import os
 import pytest
 import subprocess
 
@@ -7,22 +8,43 @@ from typing import Callable, Generator, List, Optional, Tuple
 
 from arithmetic_python_client import AverageClient, MaxClient, PerformPrimeNumberDecompositionClient, SumClient
 
-ARITHMETIC_SERVER_PATH = "../arithmetic_grpc/build/apps/arithmetic_server"
+ARITHMETIC_EXECUTABLE_NAME = "arithmetic_server"
+ARITHMETIC_SERVER_PATH = f"../arithmetic_grpc/build/apps/{ARITHMETIC_EXECUTABLE_NAME}"
 
 
 @pytest.fixture
-def running_arithmetic_server() -> Generator[subprocess.Popen, None, None]:
+def running_arithmetic_server(request: pytest.FixtureRequest) -> subprocess.Popen:
+
+    # We ensure all arithmetic server executables are terminated before/after a test because they could affect current/downstream test results
+
+    def kill_all_arithmetic_servers() -> None:
+        os.system(
+            f"for pid in $(ps -aux | grep \" + {ARITHMETIC_EXECUTABLE_NAME} \" | awk '{{print $2}}'); do kill -9 $pid; done"
+        )
+
+    kill_all_arithmetic_servers()
     process = subprocess.Popen(args=[ARITHMETIC_SERVER_PATH])
-    yield process
-    process.terminate()
+
+    def cleanup() -> None:
+        process.terminate()
+        kill_all_arithmetic_servers()
+
+    request.addfinalizer(cleanup)
+
+    return process
 
 
 @pytest.fixture
-def open_average_client() -> AverageClient:
+def open_average_client(request: pytest.FixtureRequest) -> AverageClient:
     client = AverageClient()
     assert client.open() is True
-    yield client
-    assert client.close() is True
+
+    def cleanup() -> None:
+        assert client.close() is True
+
+    request.addfinalizer(cleanup)
+
+    return client
 
 
 @pytest.fixture
@@ -47,20 +69,31 @@ def configured_prime_client() -> Tuple[PerformPrimeNumberDecompositionClient, Li
 
 @pytest.fixture
 def open_configured_prime_client(
-    configured_prime_client: Tuple[PerformPrimeNumberDecompositionClient, List[int], Event]
-) -> Generator[Tuple[PerformPrimeNumberDecompositionClient, List[int], Event], None, None]:
+    request: pytest.FixtureRequest, configured_prime_client: Tuple[PerformPrimeNumberDecompositionClient, List[int],
+                                                                   Event]
+) -> Tuple[PerformPrimeNumberDecompositionClient, List[int], Event]:
     client, output, decomposition_completed = configured_prime_client
     assert client.open() is True
-    yield client, output, decomposition_completed
-    assert client.close() is True
+
+    def cleanup() -> None:
+        assert client.close() is True
+
+    request.addfinalizer(cleanup)
+
+    return client, output, decomposition_completed
 
 
 @pytest.fixture
-def open_sum_client() -> Generator[SumClient, None, None]:
+def open_sum_client(request: pytest.FixtureRequest) -> SumClient:
     client = SumClient()
     assert client.open() is True
-    yield client
-    assert client.close() is True
+
+    def cleanup() -> None:
+        assert client.close() is True
+
+    request.addfinalizer(cleanup)
+
+    return client
 
 
 @pytest.fixture
@@ -106,9 +139,14 @@ def configured_max_client() -> Tuple[MaxClient, Event, Callable[[List[Tuple[int,
 
 @pytest.fixture
 def open_configured_max_client(
-    configured_max_client: Tuple[MaxClient, Event, Callable[[List[Tuple[int, bool]]], Generator[int, None, None]]]
-) -> Generator[Tuple[MaxClient, Event, Callable[[List[Tuple[int, bool]]], Generator[int, None, None]]], None, None]:
+    request: pytest.FixtureRequest, configured_max_client: Tuple[MaxClient, Event, Callable[[List[Tuple[int, bool]]],
+                                                                                            Generator[int, None, None]]]
+) -> Tuple[MaxClient, Event, Callable[[List[Tuple[int, bool]]], Generator[int, None, None]]]:
     client, expect_success_event, input_generator = configured_max_client
     assert client.open() is True
-    yield client, expect_success_event, input_generator
-    assert client.close() is True
+
+    def cleanup() -> None:
+        assert client.close() is True
+
+    request.addfinalizer(cleanup)
+    return client, expect_success_event, input_generator

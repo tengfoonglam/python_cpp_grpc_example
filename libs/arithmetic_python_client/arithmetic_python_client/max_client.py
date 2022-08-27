@@ -18,8 +18,7 @@ class MaxClient(PythonClient[max_grpc.MaxServiceStub]):
         self._stream_handler: ServerStreamHandler = ServerStreamHandler(stream_name="Max")
         self._stream_handler.set_initialize_stream_function(func=lambda request: self._stub.Max(request))
 
-    @staticmethod
-    def _get_request_generator(input_iterable: Iterable[int]) -> Generator[max_proto.MaxRequest, None, None]:
+    def _get_request_generator(self, input_iterable: Iterable[int]) -> Generator[max_proto.MaxRequest, None, None]:
         for number in input_iterable:
             request = max_proto.MaxRequest(number=number)
             yield request

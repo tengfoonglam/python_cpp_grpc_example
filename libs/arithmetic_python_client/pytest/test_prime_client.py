@@ -31,6 +31,7 @@ def test_prime_client_cancels(
     assert client.is_processing() is True
     time.sleep(0.25)
     client.cancel()
+    assert client.is_processing() is False
     client.wait_till_completion()
     assert not decomposition_success_event.is_set()
 
