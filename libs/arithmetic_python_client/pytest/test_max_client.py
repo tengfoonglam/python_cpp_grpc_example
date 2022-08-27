@@ -37,20 +37,53 @@ def test_max_client_cancels(
     client, expect_success_event, input_generator = open_configured_max_client
     assert client.max(input_iterable=input_generator(get_long_input_sequence_with_expected_response())) is True
     assert client.is_processing() is True
-    time.sleep(0.5)
+    time.sleep(0.05)
     client.cancel()
     assert client.is_processing() is False
     client.wait_till_completion()
     assert not expect_success_event.is_set()
 
 
-def test_max_server_cancels() -> None:
-    pass
+def test_max_server_cancels(
+    running_arithmetic_server: subprocess.Popen, open_configured_max_client: Tuple[MaxClient, Event,
+                                                                                   Callable[[List[Tuple[int, bool]]],
+                                                                                            Generator[int, None, None]]]
+) -> None:
+    client, expect_success_event, input_generator = open_configured_max_client
+    assert client.is_processing() is False
+    assert client.max(input_iterable=input_generator(get_long_input_sequence_with_expected_response())) is True
+    assert client.is_processing() is True
+    time.sleep(0.05)
+    running_arithmetic_server.terminate()
+    client.wait_till_completion()
+    assert not expect_success_event.is_set()
 
 
-def test_max_server_not_running() -> None:
-    pass
+def test_max_server_not_running(
+    running_arithmetic_server: subprocess.Popen, open_configured_max_client: Tuple[MaxClient, Event,
+                                                                                   Callable[[List[Tuple[int, bool]]],
+                                                                                            Generator[int, None, None]]]
+) -> None:
+    client, expect_success_event, input_generator = open_configured_max_client
+    running_arithmetic_server.terminate()
+    time.sleep(0.25)
+    assert client.is_grpc_active() is False
+    assert client.is_processing() is False
+    # Client will attempt to perform service and realise that it is not possible to do so but cannot not complete the task
+    assert client.max(input_iterable=input_generator(get_long_input_sequence_with_expected_response())) is True
+    client.wait_till_completion()
+    assert not expect_success_event.is_set()
 
 
-def test_max_client_not_open() -> None:
-    pass
+def test_max_client_not_open(
+    running_arithmetic_server: subprocess.Popen,
+    configured_max_client: Tuple[MaxClient, Event, Callable[[List[Tuple[int, bool]]], Generator[int, None,
+                                                                                                None]]]) -> None:
+    client, expect_success_event, input_generator = configured_max_client
+    assert client.is_grpc_active() is False
+    assert client.is_processing() is False
+    assert client.max(input_iterable=input_generator(get_long_input_sequence_with_expected_response())) is False
+    assert client.is_processing() is False
+    assert not expect_success_event.is_set()
+    client.wait_till_completion()
+    assert not expect_success_event.is_set()

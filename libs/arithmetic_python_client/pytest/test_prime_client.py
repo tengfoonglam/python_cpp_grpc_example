@@ -57,7 +57,7 @@ def test_prime_server_not_running(
     time.sleep(0.25)
     assert client.is_grpc_active() is False
     assert client.is_processing() is False
-    # Client will attempt to perform service and realise that it is not possible to do so and not complete the task
+    # Client will attempt to perform service and realise that it is not possible to do so but cannot not complete the task
     assert client.perform_prime_number_decomposition(number=math.factorial(10)) is True
     client.wait_till_completion()
     assert len(output) == 0
