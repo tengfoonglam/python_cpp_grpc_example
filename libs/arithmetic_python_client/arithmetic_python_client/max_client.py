@@ -1,5 +1,4 @@
 import grpc
-import logging
 
 from arithmetic_python_client.prime_client import PythonClient
 from arithmetic_python_client.server_stream_handler import ServerStreamHandler
@@ -22,7 +21,6 @@ class MaxClient(PythonClient[max_grpc.MaxServiceStub]):
     @staticmethod
     def _get_request_generator(input_iterable: Iterable[int]) -> Generator[max_proto.MaxRequest, None, None]:
         for number in input_iterable:
-            logging.info(f"Adding {number} into max computation")
             request = max_proto.MaxRequest(number=number)
             yield request
 

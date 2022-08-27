@@ -1,7 +1,7 @@
-import logging
 import pytest
 import subprocess
 
+from dataclasses import dataclass
 from threading import Event
 from typing import Callable, Generator, List, Optional, Tuple
 
@@ -20,14 +20,6 @@ def running_arithmetic_server() -> Generator[subprocess.Popen, None, None]:
 @pytest.fixture
 def open_average_client() -> AverageClient:
     client = AverageClient()
-    assert client.open() is True
-    yield client
-    assert client.close() is True
-
-
-@pytest.fixture
-def open_max_client() -> MaxClient:
-    client = MaxClient()
     assert client.open() is True
     yield client
     assert client.close() is True
@@ -72,32 +64,34 @@ def open_sum_client() -> Generator[SumClient, None, None]:
 
 
 @pytest.fixture
-def configured_max_client() -> Tuple[MaxClient, Event, Callable[[List[int], List[bool]], Generator[int, None, None]]]:
+def configured_max_client() -> Tuple[MaxClient, Event, Callable[[List[Tuple[int, bool]]], Generator[int, None, None]]]:
 
     client = MaxClient()
+
+    @dataclass
+    class Result:
+        current_number: Optional[int] = None
 
     expect_success_event = Event()
     ready_to_send_next_number_event = Event()
     expect_a_response_event = Event()
-    current_number: List[Optional[int]] = [None]
+    result = Result()
 
-    def input_generator(numbers_to_max: List[int], expect_a_response_list: List[bool]) -> Generator[int, None, None]:
+    def input_generator(input_sequence_with_expected_response: List[Tuple[int, bool]]) -> Generator[int, None, None]:
         TIMEOUT = 0.5
-        for number, expect_response in zip(numbers_to_max, expect_a_response_list):
+        for number, expect_response in input_sequence_with_expected_response:
             ready_to_send_next_number_event.clear()
             expect_a_response_event.clear()
-            current_number[0] = number
+            result.current_number = number
             yield number
-            assert expect_response == expect_a_response_event.is_set()
             if expect_response:
-                timed_out = ready_to_send_next_number_event.wait(TIMEOUT)
-                if timed_out:
-                    logging.error("Waiting to send next max number but timed out while waiting for a response")
-                    break
+                response_received = ready_to_send_next_number_event.wait(TIMEOUT)
+                assert response_received, "Waiting to send next max number but timed out while waiting for an expected response"
+            assert expect_response == expect_a_response_event.is_set()
 
     def on_receive(max: int) -> None:
         expect_a_response_event.set()
-        assert max == current_number[0]
+        assert max == result.current_number
         ready_to_send_next_number_event.set()
 
     def on_completion(success: bool) -> None:
@@ -108,3 +102,13 @@ def configured_max_client() -> Tuple[MaxClient, Event, Callable[[List[int], List
     client.set_completed_callback(callback=on_completion)
 
     return client, expect_success_event, input_generator
+
+
+@pytest.fixture
+def open_configured_max_client(
+    configured_max_client: Tuple[MaxClient, Event, Callable[[List[Tuple[int, bool]]], Generator[int, None, None]]]
+) -> Generator[Tuple[MaxClient, Event, Callable[[List[Tuple[int, bool]]], Generator[int, None, None]]], None, None]:
+    client, expect_success_event, input_generator = configured_max_client
+    assert client.open() is True
+    yield client, expect_success_event, input_generator
+    assert client.close() is True
