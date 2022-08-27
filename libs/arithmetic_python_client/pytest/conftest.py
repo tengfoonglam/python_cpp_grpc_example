@@ -48,55 +48,6 @@ def open_average_client(request: pytest.FixtureRequest) -> AverageClient:
 
 
 @pytest.fixture
-def configured_prime_client() -> Tuple[PerformPrimeNumberDecompositionClient, List[int], Event]:
-    client = PerformPrimeNumberDecompositionClient()
-
-    decomposition_success_event = Event()
-    output = []
-
-    def on_receive(factor: int) -> None:
-        output.append(factor)
-
-    def on_completion(success: bool) -> None:
-        if success:
-            decomposition_success_event.set()
-
-    client.set_new_response_callback(callback=on_receive)
-    client.set_completed_callback(callback=on_completion)
-
-    return client, output, decomposition_success_event
-
-
-@pytest.fixture
-def open_configured_prime_client(
-    request: pytest.FixtureRequest, configured_prime_client: Tuple[PerformPrimeNumberDecompositionClient, List[int],
-                                                                   Event]
-) -> Tuple[PerformPrimeNumberDecompositionClient, List[int], Event]:
-    client, output, decomposition_completed = configured_prime_client
-    assert client.open() is True
-
-    def cleanup() -> None:
-        assert client.close() is True
-
-    request.addfinalizer(cleanup)
-
-    return client, output, decomposition_completed
-
-
-@pytest.fixture
-def open_sum_client(request: pytest.FixtureRequest) -> SumClient:
-    client = SumClient()
-    assert client.open() is True
-
-    def cleanup() -> None:
-        assert client.close() is True
-
-    request.addfinalizer(cleanup)
-
-    return client
-
-
-@pytest.fixture
 def configured_max_client() -> Tuple[MaxClient, Event, Callable[[List[Tuple[int, bool]]], Generator[int, None, None]]]:
 
     client = MaxClient()
@@ -150,3 +101,52 @@ def open_configured_max_client(
 
     request.addfinalizer(cleanup)
     return client, expect_success_event, input_generator
+
+
+@pytest.fixture
+def configured_prime_client() -> Tuple[PerformPrimeNumberDecompositionClient, List[int], Event]:
+    client = PerformPrimeNumberDecompositionClient()
+
+    decomposition_success_event = Event()
+    output = []
+
+    def on_receive(factor: int) -> None:
+        output.append(factor)
+
+    def on_completion(success: bool) -> None:
+        if success:
+            decomposition_success_event.set()
+
+    client.set_new_response_callback(callback=on_receive)
+    client.set_completed_callback(callback=on_completion)
+
+    return client, output, decomposition_success_event
+
+
+@pytest.fixture
+def open_configured_prime_client(
+    request: pytest.FixtureRequest, configured_prime_client: Tuple[PerformPrimeNumberDecompositionClient, List[int],
+                                                                   Event]
+) -> Tuple[PerformPrimeNumberDecompositionClient, List[int], Event]:
+    client, output, decomposition_completed = configured_prime_client
+    assert client.open() is True
+
+    def cleanup() -> None:
+        assert client.close() is True
+
+    request.addfinalizer(cleanup)
+
+    return client, output, decomposition_completed
+
+
+@pytest.fixture
+def open_sum_client(request: pytest.FixtureRequest) -> SumClient:
+    client = SumClient()
+    assert client.open() is True
+
+    def cleanup() -> None:
+        assert client.close() is True
+
+    request.addfinalizer(cleanup)
+
+    return client
