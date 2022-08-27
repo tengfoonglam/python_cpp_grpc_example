@@ -10,6 +10,9 @@ using namespace arithmetic_grpc;
 class PrimeClientServerTests
     : public ::testing::TestWithParam<
           std::pair<std::uint64_t, std::vector<std::uint64_t>>> {
+ public:
+  static constexpr std::uint64_t SIMULATED_PROCESSSING_TIME_MS{0};
+
  protected:
   void SetUp() {
     server_ptr_ = CreateServerAndAttachService(DEFAULT_GRPC_ADDRESS, &service_);
@@ -24,7 +27,8 @@ class PrimeClientServerTests
   }
 
  private:
-  PerformPrimeNumberDecompositionServiceImpl service_;
+  PerformPrimeNumberDecompositionServiceImpl service_{
+      SIMULATED_PROCESSSING_TIME_MS};
   std::unique_ptr<Server> server_ptr_;
 };
 

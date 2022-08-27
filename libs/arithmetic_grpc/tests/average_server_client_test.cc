@@ -34,12 +34,21 @@ TEST_P(AverageClientServerTests, AverageNormalOperations) {
   AverageClient client(grpc::CreateChannel(DEFAULT_GRPC_ADDRESS,
                                            grpc::InsecureChannelCredentials()));
   for (const auto number : numbers_to_average) {
-    client.AddNumber(number);
+    ASSERT_TRUE(client.AddNumber(number));
   }
 
   const auto& [success, output] = client.ComputeAverage();
   ASSERT_EQ(success, expected_success);
   ASSERT_FLOAT_EQ(output, answer);
+}
+
+TEST_P(AverageClientServerTests, AverageServerCloseWhileProcessing) {
+  const auto [numbers_to_average, answer, expected_success] = GetParam();
+  AverageClient client(grpc::CreateChannel(DEFAULT_GRPC_ADDRESS,
+                                           grpc::InsecureChannelCredentials()));
+  for (const auto number : numbers_to_average) {
+    ASSERT_TRUE(client.AddNumber(number));
+  }
 }
 
 INSTANTIATE_TEST_CASE_P(

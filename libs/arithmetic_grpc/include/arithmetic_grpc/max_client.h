@@ -4,6 +4,7 @@
 #include <arithmetic_proto/max.grpc.pb.h>
 #include <grpc++/grpc++.h>
 
+#include <cstdint>
 #include <limits>
 #include <memory>
 #include <thread>
@@ -18,7 +19,8 @@ using grpc::Channel;
 
 class MaxClient {
  public:
-  MaxClient(std::shared_ptr<Channel> channel);
+  MaxClient(std::shared_ptr<Channel> channel,
+            std::uint64_t simulated_processing_time_ms = 200);
   std::pair<bool, std::int64_t> GetMax(
       const std::vector<std::int64_t>& numbers);
   static constexpr std::pair<bool, std::int64_t> MAX_FAILURE_MESSAGE{
@@ -26,6 +28,7 @@ class MaxClient {
 
  private:
   std::unique_ptr<MaxService::Stub> stub_ptr_;
+  const std::uint64_t simulated_processing_time_ms_;
 };
 
 }  // namespace arithmetic_grpc

@@ -1,0 +1,6 @@
+# Setup Tools:
+setuptools==63.4.3
+
+# Developer Tools:
+pre-commit==2.13.0
+pytest==6.2.4
