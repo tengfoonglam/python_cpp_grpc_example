@@ -1,18 +1,16 @@
 import math
 import pytest
-import subprocess
 import time
 
-from arithmetic_python_client import PerformPrimeNumberDecompositionClient
+from testing_helpers import ArithmeticServerProcess, ConfiguredPrimeClient
 
-from threading import Event
-from typing import List, Tuple
+from typing import List
 
 
 @pytest.mark.parametrize("input, answer", [(0, []), (999, [3, 3, 3, 37]), (3125, [5, 5, 5, 5, 5])])
-def test_prime_normal_operations(running_arithmetic_server: subprocess.Popen,
-                                 open_configured_prime_client: Tuple[PerformPrimeNumberDecompositionClient, List[int],
-                                                                     Event], input: int, answer: List[int]) -> None:
+def test_prime_normal_operations(running_arithmetic_server: ArithmeticServerProcess,
+                                 open_configured_prime_client: ConfiguredPrimeClient, input: int,
+                                 answer: List[int]) -> None:
     client, output, decomposition_success_event = open_configured_prime_client
     assert client.is_processing() is False
     assert client.perform_prime_number_decomposition(number=input) is True
@@ -22,9 +20,8 @@ def test_prime_normal_operations(running_arithmetic_server: subprocess.Popen,
     assert output == answer
 
 
-def test_prime_client_cancels(
-        running_arithmetic_server: subprocess.Popen,
-        open_configured_prime_client: Tuple[PerformPrimeNumberDecompositionClient, List[int], Event]) -> None:
+def test_prime_client_cancels(running_arithmetic_server: ArithmeticServerProcess,
+                              open_configured_prime_client: ConfiguredPrimeClient) -> None:
     client, _, decomposition_success_event = open_configured_prime_client
     assert client.is_processing() is False
     assert client.perform_prime_number_decomposition(number=math.factorial(10)) is True
@@ -36,24 +33,22 @@ def test_prime_client_cancels(
     assert not decomposition_success_event.is_set()
 
 
-def test_prime_server_cancels(
-        running_arithmetic_server: subprocess.Popen,
-        open_configured_prime_client: Tuple[PerformPrimeNumberDecompositionClient, List[int], Event]) -> None:
+def test_prime_server_cancels(running_arithmetic_server: ArithmeticServerProcess,
+                              open_configured_prime_client: ConfiguredPrimeClient) -> None:
     client, _, decomposition_success_event = open_configured_prime_client
     assert client.is_processing() is False
     assert client.perform_prime_number_decomposition(number=math.factorial(10)) is True
     assert client.is_processing() is True
     time.sleep(0.25)
-    running_arithmetic_server.terminate()
+    running_arithmetic_server.kill()
     client.wait_till_completion()
     assert not decomposition_success_event.is_set()
 
 
-def test_prime_server_not_running(
-        running_arithmetic_server: subprocess.Popen,
-        open_configured_prime_client: Tuple[PerformPrimeNumberDecompositionClient, List[int], Event]) -> None:
+def test_prime_server_not_running(running_arithmetic_server: ArithmeticServerProcess,
+                                  open_configured_prime_client: ConfiguredPrimeClient) -> None:
     client, output, decomposition_success_event = open_configured_prime_client
-    running_arithmetic_server.terminate()
+    running_arithmetic_server.kill()
     time.sleep(0.25)
     assert client.is_grpc_active() is False
     assert client.is_processing() is False
@@ -64,9 +59,8 @@ def test_prime_server_not_running(
     assert not decomposition_success_event.is_set()
 
 
-def test_prime_client_not_open(
-        running_arithmetic_server: subprocess.Popen,
-        configured_prime_client: Tuple[PerformPrimeNumberDecompositionClient, List[int], Event]) -> None:
+def test_prime_client_not_open(running_arithmetic_server: ArithmeticServerProcess,
+                               configured_prime_client: ConfiguredPrimeClient) -> None:
     client, output, decomposition_success_event = configured_prime_client
     assert client.is_grpc_active() is False
     assert client.is_processing() is False

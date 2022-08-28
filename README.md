@@ -1,7 +1,17 @@
 # python_cpp_grpc_example
 
 ---
- ***python_cpp_grpc_example*** is an example on how to create a Python-C++ interface using [gRPC](https://grpc.io/).
+ ***python_cpp_grpc_example*** is an example on how to create a Python-C++ interface using [gRPC](https://grpc.io/) (gRPC Remote Procedure Calls).
+
+The server is written in C++ while the client is in Python. Such a setup allows for performance-critical code to be written in C++ while the rest of the code is written in Python which is more productive to develop in. This is potentially very useful in robotic applications where you want your algorithms/driver code to be peformant and written in C++ but at the same time provide a user-friendly Python API for the end user.
+
+In this project, the C++ server is Dockerized while the Python client is installed in a Python virtual environment so you can run the example without any system wide installations (unless you want to).
+
+This repository implements the 4 different service methods offered by gRPC.
+ 1. **gRPC Unary - Sum service**: Request takes in 2 numbers and returns a response that contains the sum
+ 2. **gPRC Server Streaming - Prime service**: Request takes in one integer and returns a stream of reponses that represent the prime number decomposition of that number
+ 3. **gRPC Client Streaming - Average service**: A stream of requests that each contains an integer and returns a response with the average of the numbers
+ 4. **gRPC Bi-Directional Streaming - Max service**: A stream of requests that each contains an integer and returns a stream of responses that updates the client when the maximum of the input number stream has changed
 
  ### Building and Running C++ Arithmetic Server using Docker
 
@@ -24,3 +34,35 @@
         2. ```./apps/max_server``` / ```./apps/interactive_max_client```
         3. ```./apps/prime_server``` / ```./apps/interactive_prime_client```
         4. ```./apps/sum_server``` / ```./apps/interactive_sum_client```
+
+## Setting up and Running Python Clients in Python Virtual Environment
+
+1. Initialize Python virtual environment, pip install dependencies and arithmetic client ```./scripts/initialise_python_environment.sh```
+2. Enter arithmetic_python_client package folder ```cd libs/arithmetic_python_client/```
+3. Run Pytests (without/with verbosity):
+   1. If you have built the Docker containers: ```pytest pytest/``` / ```pytest -vvv -s --log-cli-level=INFO pytest/```
+   2. If you have built from source: ```pytest  --use-local-server pytest/``` / ```pytest -vvv -s --log-cli-level=INFO --use-local-server pytest/```
+4. **With the Arithmetic server running** you can launch the interactive Python clients:
+   1. Average: ```./apps/interactive_average_client.py```
+   2. Max: ```./apps/interactive_max_client.py```
+   3. Prime: ```./apps/interactive_prime_client.py```
+   4. Sum: ```./apps/interactive_sum_client.py```
+
+## Evans Universal gRPC Client
+
+gRPC Server Reflection is enabled in the arithmetic server and this enables the user to use the [Evans universal gRPC client](https://github.com/ktr0731/evans) to interact with the server using terminal commands, without the Python client. This is extremely useful in the case when you need to do quick sanity checks to ensure the server is working as expected.
+
+1. Install [Evans](https://github.com/ktr0731/evans)
+2. Launch an instance of the arithmetic server (dockerized or local executable)
+3. Launch Evans```evans -r --host 0.0.0.0 --port 50051 repl```
+   1. Show available services: ```show service```
+   2. Show available messages: ```show message```
+   3. Use a service (e.g. SumService):
+      1. Select Service: ```service SumService```
+      2. Call service: ```call Sum```
+      3. Follow prompts from terminal to enter input
+   4. Exit: ```exit```
+
+## Acknowledgements
+
+ * The arithmetic examples are adapted from this [gRPC Master Class](https://www.udemy.com/course/grpc-golang/) by [Clément Jean](https://www.udemy.com/course/grpc-golang/#instructor-1). The original course implemented these gRPC services in Go but I ported them over to C++/Python as a personal exercise.
