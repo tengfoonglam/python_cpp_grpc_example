@@ -2,7 +2,7 @@ import math
 import pytest
 import time
 
-from .testing_helpers import ArithmeticServerProcess, ConfiguredPrimeClient
+from testing_helpers import ArithmeticServerProcess, ConfiguredPrimeClient
 
 from typing import List
 

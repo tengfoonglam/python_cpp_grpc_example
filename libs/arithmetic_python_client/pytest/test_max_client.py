@@ -1,7 +1,7 @@
 import pytest
 import time
 
-from .testing_helpers import ArithmeticServerProcess, ConfiguredMaxClient
+from testing_helpers import ArithmeticServerProcess, ConfiguredMaxClient
 
 from typing import List, Tuple
 

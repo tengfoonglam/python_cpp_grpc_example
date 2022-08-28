@@ -2,7 +2,7 @@ import math
 import pytest
 import time
 
-from .testing_helpers import ArithmeticServerProcess
+from testing_helpers import ArithmeticServerProcess
 
 from arithmetic_python_client import AverageClient
 

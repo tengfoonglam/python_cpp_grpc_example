@@ -4,7 +4,7 @@ import pytest
 import _pytest
 import subprocess
 
-from .testing_helpers import ArithmeticServerProcess, ConfiguredMaxClient, ConfiguredPrimeClient, IntGenerator
+from testing_helpers import ArithmeticServerProcess, ConfiguredMaxClient, ConfiguredPrimeClient, IntGenerator
 
 from arithmetic_python_client import AverageClient, MaxClient, PerformPrimeNumberDecompositionClient, SumClient
 
