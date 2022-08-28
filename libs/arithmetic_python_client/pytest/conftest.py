@@ -1,33 +1,62 @@
-import os
+import docker
+import logging
 import pytest
+import _pytest
 import subprocess
 
-from dataclasses import dataclass
-from threading import Event
-from typing import Callable, Generator, List, Optional, Tuple
+from .testing_helpers import ArithmeticServerProcess, ConfiguredMaxClient, ConfiguredPrimeClient, IntGenerator
 
 from arithmetic_python_client import AverageClient, MaxClient, PerformPrimeNumberDecompositionClient, SumClient
 
-ARITHMETIC_EXECUTABLE_NAME = "arithmetic_server"
-ARITHMETIC_SERVER_PATH = f"../arithmetic_grpc/build/apps/{ARITHMETIC_EXECUTABLE_NAME}"
+from dataclasses import dataclass
+from threading import Event
+from typing import List, Optional, Tuple
+
+ARITHMETIC_SERVER_IMAGE_NAME = "arithmetic_server"
+DEFAULT_LOCAL_ARITHMETIC_SERVER_PATH = "../arithmetic_grpc/build/apps/arithmetic_server"
+
+
+def pytest_addoption(parser: _pytest.config.argparsing.Parser) -> None:
+    parser.addoption("--use-local-server",
+                     action="store_true",
+                     default=False,
+                     help=f"Use local arithmetic server executable located at {DEFAULT_LOCAL_ARITHMETIC_SERVER_PATH}")
+    parser.addoption("--server-path",
+                     action="store",
+                     default="",
+                     help="Path of arithmetic server executable to be used for the pytests")
+
+
+def pytest_configure(config: _pytest.config.Config) -> None:
+    original_logging_level = logging.root.level
+    logging.getLogger().setLevel(logging.INFO)
+
+    pytest.server_path = ""
+    if config.option.use_local_server:
+        pytest.server_path = DEFAULT_LOCAL_ARITHMETIC_SERVER_PATH
+        logging.info(f"Using default arithmetic server executable for testing: {pytest.server_path}")
+    elif len(config.option.server_path) > 0:
+        pytest.server_path = config.option.server_path
+        logging.info(f"Using specified arithmetic server executable for testing: {pytest.server_path}")
+    else:
+        logging.info(f"Using dockerized arithmetic server named {ARITHMETIC_SERVER_IMAGE_NAME} for testing")
+
+    logging.getLogger().setLevel(original_logging_level)
 
 
 @pytest.fixture
-def running_arithmetic_server(request: pytest.FixtureRequest) -> subprocess.Popen:
+def running_arithmetic_server(request: pytest.FixtureRequest) -> ArithmeticServerProcess:
 
     # We ensure all arithmetic server executables are terminated before/after a test because they could affect current/downstream test results
 
-    def kill_all_arithmetic_servers() -> None:
-        os.system(
-            f"for pid in $(ps -aux | grep \" + {ARITHMETIC_EXECUTABLE_NAME} \" | awk '{{print $2}}'); do kill -9 $pid; done"
-        )
-
-    kill_all_arithmetic_servers()
-    process = subprocess.Popen(args=[ARITHMETIC_SERVER_PATH])
+    if len(pytest.server_path) > 0:
+        process = ArithmeticServerProcess(process=subprocess.Popen(args=[pytest.server_path]))
+    else:
+        process = ArithmeticServerProcess(process=docker.from_env().containers.run(
+            image=ARITHMETIC_SERVER_IMAGE_NAME, init=True, detach=True, ports={'50051/tcp': 50051}))
 
     def cleanup() -> None:
-        process.terminate()
-        kill_all_arithmetic_servers()
+        process.kill()
 
     request.addfinalizer(cleanup)
 
@@ -48,7 +77,7 @@ def open_average_client(request: pytest.FixtureRequest) -> AverageClient:
 
 
 @pytest.fixture
-def configured_max_client() -> Tuple[MaxClient, Event, Callable[[List[Tuple[int, bool]]], Generator[int, None, None]]]:
+def configured_max_client() -> ConfiguredMaxClient:
 
     client = MaxClient()
 
@@ -61,7 +90,7 @@ def configured_max_client() -> Tuple[MaxClient, Event, Callable[[List[Tuple[int,
     expect_a_response_event = Event()
     result = Result()
 
-    def input_generator(input_sequence_with_expected_response: List[Tuple[int, bool]]) -> Generator[int, None, None]:
+    def input_generator(input_sequence_with_expected_response: List[Tuple[int, bool]]) -> IntGenerator:
         TIMEOUT = 0.5
         for number, expect_response in input_sequence_with_expected_response:
             ready_to_send_next_number_event.clear()
@@ -89,10 +118,8 @@ def configured_max_client() -> Tuple[MaxClient, Event, Callable[[List[Tuple[int,
 
 
 @pytest.fixture
-def open_configured_max_client(
-    request: pytest.FixtureRequest, configured_max_client: Tuple[MaxClient, Event, Callable[[List[Tuple[int, bool]]],
-                                                                                            Generator[int, None, None]]]
-) -> Tuple[MaxClient, Event, Callable[[List[Tuple[int, bool]]], Generator[int, None, None]]]:
+def open_configured_max_client(request: pytest.FixtureRequest,
+                               configured_max_client: ConfiguredMaxClient) -> ConfiguredMaxClient:
     client, expect_success_event, input_generator = configured_max_client
     assert client.open() is True
 
@@ -104,7 +131,7 @@ def open_configured_max_client(
 
 
 @pytest.fixture
-def configured_prime_client() -> Tuple[PerformPrimeNumberDecompositionClient, List[int], Event]:
+def configured_prime_client() -> ConfiguredPrimeClient:
     client = PerformPrimeNumberDecompositionClient()
 
     decomposition_success_event = Event()
@@ -124,10 +151,8 @@ def configured_prime_client() -> Tuple[PerformPrimeNumberDecompositionClient, Li
 
 
 @pytest.fixture
-def open_configured_prime_client(
-    request: pytest.FixtureRequest, configured_prime_client: Tuple[PerformPrimeNumberDecompositionClient, List[int],
-                                                                   Event]
-) -> Tuple[PerformPrimeNumberDecompositionClient, List[int], Event]:
+def open_configured_prime_client(request: pytest.FixtureRequest,
+                                 configured_prime_client: ConfiguredPrimeClient) -> ConfiguredPrimeClient:
     client, output, decomposition_completed = configured_prime_client
     assert client.open() is True
 

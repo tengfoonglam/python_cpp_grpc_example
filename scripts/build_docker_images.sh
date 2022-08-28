@@ -14,6 +14,6 @@ pushd $DIR/..
     fi
 
     docker build $OPTION --file $DOCKERFILE --target arithmetic_cpp_grpc -t arithmetic_cpp_grpc .
-    docker build $OPTION --file $DOCKERFILE --target cpp_grpc_arithmetic_server -t cpp_grpc_arithmetic_server .
+    docker build $OPTION --file $DOCKERFILE --target arithmetic_server -t arithmetic_server .
 
 popd

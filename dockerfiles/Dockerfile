@@ -36,7 +36,7 @@ RUN NPROC=1 && if [ "$(nproc)" -gt 1 ]; then NPROC="$(($(nproc) - 1))"; fi &&\
 cmake ../ && make -j$NPROC
 
 # Copy executable to deployment image
-FROM python_cpp_grpc_base as cpp_grpc_arithmetic_server
+FROM python_cpp_grpc_base as arithmetic_server
 WORKDIR /
 COPY --from=arithmetic_cpp_grpc /libs/arithmetic_grpc/build/apps/arithmetic_server ./
 CMD ["./arithmetic_server"]

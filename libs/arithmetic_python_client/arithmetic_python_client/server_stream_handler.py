@@ -67,9 +67,10 @@ class ServerStreamHandler:
                 self._new_response_callback(response=response)
             success = not self._responses.cancelled()
         except grpc.RpcError:
-            logging.exception(f"RPC error occurred when performing stream {self._stream_name}")
+            logging.exception(
+                f"RPC error occurred when performing stream {self._stream_name}, most likely cancelled midway")
         except Exception:
-            logging.exception(f"Error occurred when performing stream {self._stream_name}")
+            logging.exception(f"Non-RPC Error occurred when performing stream {self._stream_name}")
         self._completed_callback(success=success)
         self._responses = None
         self._completion_event.set()
