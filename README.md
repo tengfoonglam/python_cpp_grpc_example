@@ -3,9 +3,9 @@
 ---
  ***python_cpp_grpc_example*** is an example on how to create a Python-C++ interface using [gRPC](https://grpc.io/) (gRPC Remote Procedure Calls).
 
-The server is written in C++ while the client is in Python. Such a setup allows for performance-critical code to be written in C++ while the rest of the code is written in Python which is more productive to develop in. This is potentially very useful in robotic applications where you want your algorithms/driver code to be peformant and written in C++ and provide a user-friendly Python API for your end user.
+The server is written in C++ while the client is in Python. Such a setup allows for performance-critical code to be written in C++ while the rest of the code is written in Python which is more productive to develop in. This is potentially very useful in robotic applications where you want your algorithms/driver code to be peformant and written in C++ but at the same time provide a user-friendly Python API for the end user.
 
-In this project, the C++ server is Dockerized while the Python client can be run in a Python virtual environment so you can run the example without any system wide installations (unless you want to).
+In this project, the C++ server is Dockerized while the Python client is installed in a Python virtual environment so you can run the example without any system wide installations (unless you want to).
 
 This repository implements the 4 different service methods offered by gRPC.
  1. **gRPC Unary - Sum service**: Request takes in 2 numbers and returns a response that contains the sum
