@@ -8,7 +8,7 @@ from arithmetic_python_client import MaxClient
 from arithmetic_python_client.utils import get_terminal_input_generator
 
 
-def interactive_average() -> None:
+def interactive_max() -> None:
 
     try:
         client = MaxClient()
@@ -55,4 +55,4 @@ def interactive_average() -> None:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    interactive_average()
+    interactive_max()
