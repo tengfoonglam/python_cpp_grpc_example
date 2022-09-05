@@ -20,9 +20,9 @@ class TestSumNormalOperations:
         future = open_sum_client.sum_non_blocking(number_1=number_1, number_2=number_2)
         assert future is not None
         assert not future.done()
-        assert future.wait_till_completion() == answer
+        assert future.wait_for_result() == answer
         assert future.done()
-        assert future.wait_till_completion() == answer
+        assert future.wait_for_result() == answer
         assert future.cancel() is False
 
 
@@ -39,6 +39,17 @@ def test_sum_server_cancels(running_arithmetic_server: ArithmeticServerProcess, 
     assert output is None
 
 
+def test_sum_non_blocking_future_timeout(running_arithmetic_server: ArithmeticServerProcess,
+                                         open_sum_client: SumClient) -> None:
+    future = open_sum_client.sum_non_blocking(number_1=0, number_2=0)
+    assert future.done() is False
+    assert future.wait_for_result(timeout=0.0) is None
+    assert future.done() is False
+    assert future.wait_for_result() == 0
+    assert future.done() is True
+    assert future.cancel() is False
+
+
 def test_sum_non_blocking_server_cancels(running_arithmetic_server: ArithmeticServerProcess,
                                          open_sum_client: SumClient) -> None:
     def terminate_server_with_delay() -> None:
@@ -49,10 +60,10 @@ def test_sum_non_blocking_server_cancels(running_arithmetic_server: ArithmeticSe
     server_termination_thread.start()
     future = open_sum_client.sum_non_blocking(number_1=0, number_2=0)
     server_termination_thread.join()
-
+    assert future is not None
     assert future.done()
     assert future.cancel() is False
-    assert future.wait_till_completion() is None
+    assert future.wait_for_result() is None
 
 
 def test_sum_non_blocking_client_cancel(running_arithmetic_server: ArithmeticServerProcess,
@@ -61,20 +72,20 @@ def test_sum_non_blocking_client_cancel(running_arithmetic_server: ArithmeticSer
     assert future is not None
     assert future.done() is False
     assert future.cancel() is True
-    assert future.wait_till_completion() is None
+    assert future.wait_for_result() is None
     assert future.done() is True
     assert future.cancel() is False
 
 
 def test_sum_server_not_running(running_arithmetic_server: ArithmeticServerProcess, open_sum_client: SumClient) -> None:
     running_arithmetic_server.kill()
-    time.sleep(0.25)
+    time.sleep(0.5)
     assert open_sum_client.is_grpc_active() is False
     assert open_sum_client.sum(number_1=0, number_2=0) is None
     future = open_sum_client.sum_non_blocking(number_1=0, number_2=0)
     assert future is not None
     assert future.done() is True
-    assert future.wait_till_completion() is None
+    assert future.wait_for_result() is None
 
 
 def test_sum_client_not_open(running_arithmetic_server: ArithmeticServerProcess) -> None:

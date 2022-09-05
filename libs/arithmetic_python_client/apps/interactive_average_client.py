@@ -37,7 +37,7 @@ def interactive_average() -> None:
                 logging.info("Waiting for computation to complete...")
 
                 if future is not None:
-                    answer = future.wait_till_completion()
+                    answer = future.wait_for_result()
 
             if answer is not None:
                 logging.info(f"Received answer: Average of {numbers_to_average} is {answer}")
