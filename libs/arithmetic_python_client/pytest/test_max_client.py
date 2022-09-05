@@ -25,12 +25,13 @@ def test_max_normal_operations(running_arithmetic_server: ArithmeticServerProces
     assert expect_success_event.is_set()
 
 
+@pytest.mark.parametrize("sleep_time", [t * 1e-3 for t in range(0, 51, 10)])
 def test_max_client_cancels(running_arithmetic_server: ArithmeticServerProcess,
-                            open_configured_max_client: ConfiguredMaxClient) -> None:
+                            open_configured_max_client: ConfiguredMaxClient, sleep_time: float) -> None:
     client, expect_success_event, input_generator = open_configured_max_client
     assert client.max(input_iterable=input_generator(get_long_input_sequence_with_expected_response())) is True
     assert client.is_processing() is True
-    time.sleep(0.05)
+    time.sleep(sleep_time)
     client.cancel()
     assert client.is_processing() is False
     client.wait_till_completion()
@@ -43,7 +44,7 @@ def test_max_server_cancels(running_arithmetic_server: ArithmeticServerProcess,
     assert client.is_processing() is False
     assert client.max(input_iterable=input_generator(get_long_input_sequence_with_expected_response())) is True
     assert client.is_processing() is True
-    time.sleep(0.05)
+    time.sleep(0.25)
     running_arithmetic_server.kill()
     client.wait_till_completion()
     assert not expect_success_event.is_set()
