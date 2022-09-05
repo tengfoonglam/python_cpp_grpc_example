@@ -1,6 +1,7 @@
 import grpc
 import logging
 
+from arithmetic_python_client.future import Future
 from arithmetic_python_client.python_client import PythonClient
 
 from arithmetic_proto import average_pb2_grpc as average_grpc
@@ -36,3 +37,14 @@ class AverageClient(PythonClient[average_grpc.AverageServiceStub]):
             return response.answer
 
         return attempt_average()
+
+    def average_non_blocking(self, input_iterable: Iterable[int]) -> Optional[Future[float]]:
+        if not self._channel_and_stubs_initialized():
+            return None
+
+        @PythonClient.return_none_if_exception_caught
+        def attempt_average_non_blocking() -> Future[float]:
+            grpc_future = self._stub.Average.future(self._get_request_generator(input_iterable=input_iterable))
+            return Future[float](grpc_future=grpc_future, conversion_func=lambda response: response.answer)
+
+        return attempt_average_non_blocking()
