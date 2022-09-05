@@ -17,7 +17,7 @@ class Future(Generic[T]):
     def done(self) -> bool:
         return self._grpc_future.done()
 
-    def wait_till_completion(self, timeout: float) -> Optional[T]:
+    def wait_till_completion(self, timeout: Optional[float] = None) -> Optional[T]:
         try:
             response = self._grpc_future.result(timeout=timeout)
             return self._conversion_func(response)

@@ -36,7 +36,7 @@ def interactive_max() -> None:
 
         logging.info("Max Client successfully opened")
 
-        while (client.is_grpc_active()):
+        while client.is_grpc_active():
             numbers_to_max = []
             start_success = client.max(input_iterable=get_terminal_input_generator(
                 new_entry_callback=lambda new_entry: numbers_to_max.append(new_entry)))

@@ -20,7 +20,7 @@ def interactive_average() -> None:
 
         logging.info("Average Client successfully opened")
 
-        while (client.is_grpc_active()):
+        while client.is_grpc_active():
             numbers_to_average = []
             answer = client.average(input_iterable=get_terminal_input_generator(
                 new_entry_callback=lambda new_entry: numbers_to_average.append(new_entry)))
