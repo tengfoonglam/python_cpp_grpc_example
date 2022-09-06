@@ -25,6 +25,8 @@ class Future(Generic[T]):
             logging.error("Timed out while waiting from response")
         except grpc.FutureCancelledError:
             logging.error("Call was cancelled while waiting for response")
+        except grpc.RpcError:
+            logging.exception("RPC error occurred while waiting for response")
         except Exception:
             logging.exception("Non-gRPC exception called while waiting for response")
         return None
