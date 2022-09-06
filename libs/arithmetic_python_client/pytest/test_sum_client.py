@@ -84,8 +84,8 @@ def test_sum_server_not_running(running_arithmetic_server: ArithmeticServerProce
     assert open_sum_client.sum(number_1=0, number_2=0) is None
     future = open_sum_client.sum_non_blocking(number_1=0, number_2=0)
     assert future is not None
-    assert future.done() is True
     assert future.wait_for_result() is None
+    assert future.done() is True
 
 
 def test_sum_client_not_open(running_arithmetic_server: ArithmeticServerProcess) -> None:

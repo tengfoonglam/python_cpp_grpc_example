@@ -92,6 +92,10 @@ def test_average_server_not_running(running_arithmetic_server: ArithmeticServerP
     time.sleep(0.2)
     assert open_average_client.is_grpc_active() is False
     assert open_average_client.average(input_iterable=list(range(1000000))) is None
+    future = open_average_client.average_non_blocking(input_iterable=list(range(1000000)))
+    assert future is not None
+    assert future.wait_for_result() is None
+    assert future.done() is True
 
 
 def test_average_client_not_open(running_arithmetic_server: ArithmeticServerProcess) -> None:
