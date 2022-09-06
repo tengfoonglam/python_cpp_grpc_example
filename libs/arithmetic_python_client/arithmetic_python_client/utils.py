@@ -5,11 +5,11 @@ from typing import Callable, Generator, Optional, TypeVar
 T = TypeVar('T')
 
 
-def get_int_input_from_terminal(display_message: str) -> Optional[int]:
+def get_int_input_from_terminal(display_message: str = "") -> Optional[int]:
     return get_input_from_terminal(conversion_func=lambda input_str: int(input_str), display_message=display_message)
 
 
-def get_float_input_from_terminal(display_message: str) -> Optional[float]:
+def get_float_input_from_terminal(display_message: str = "") -> Optional[float]:
     return get_input_from_terminal(conversion_func=lambda input_str: float(input_str), display_message=display_message)
 
 
@@ -28,9 +28,8 @@ def get_input_from_terminal(conversion_func: Callable[[str], T], display_message
 
 def get_terminal_input_generator(new_entry_callback: Callable = lambda new_entry: None) -> Generator[int, None, None]:
     input_completed = False
-    while (not input_completed):
-        number = get_input_from_terminal(conversion_func=lambda input_str: int(input_str),
-                                         display_message="Input value (leave empty to start computation):")
+    while not input_completed:
+        number = get_int_input_from_terminal(display_message="Input value (leave empty to start computation):")
         if number is not None:
             logging.info(f"Adding {number} into computation")
             new_entry_callback(new_entry=number)
