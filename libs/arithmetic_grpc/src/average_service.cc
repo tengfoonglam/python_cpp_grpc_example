@@ -33,6 +33,8 @@ Status AverageServiceImpl::Average(__attribute__((unused))
     std::cout << "Answer: " << answer << std::endl;
   }
 
+  std::cout << "Average Service completed" << std::endl;
+
   return !service_cancelled ? Status::OK : Status::CANCELLED;
 }
 

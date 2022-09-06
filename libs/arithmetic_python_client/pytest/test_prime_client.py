@@ -20,13 +20,14 @@ def test_prime_normal_operations(running_arithmetic_server: ArithmeticServerProc
     assert output == answer
 
 
+@pytest.mark.parametrize("sleep_time", [t * 1e-3 for t in range(0, 51, 10)])
 def test_prime_client_cancels(running_arithmetic_server: ArithmeticServerProcess,
-                              open_configured_prime_client: ConfiguredPrimeClient) -> None:
+                              open_configured_prime_client: ConfiguredPrimeClient, sleep_time: float) -> None:
     client, _, decomposition_success_event = open_configured_prime_client
     assert client.is_processing() is False
     assert client.perform_prime_number_decomposition(number=math.factorial(10)) is True
     assert client.is_processing() is True
-    time.sleep(0.25)
+    time.sleep(sleep_time)
     client.cancel()
     assert client.is_processing() is False
     client.wait_till_completion()

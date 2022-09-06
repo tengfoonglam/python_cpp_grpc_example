@@ -9,6 +9,7 @@ class ServerStreamHandler:
         self._stream_name = stream_name
         self._processing_thread: Thread = Thread()
         self._completion_event: Event = Event()
+        self._responses_initialized: Event = Event()
         self._responses = None
         self._generate_request_function: Callable = lambda: None
         self._initialize_stream_function: Callable = lambda request: []
@@ -36,6 +37,8 @@ class ServerStreamHandler:
         if not self.is_processing():
             logging.warning(f"Cancel called when {self._stream_name} is not in progress, ignoring call")
             return
+        # Wait for responses to initialize (no longer None) before attempting to cancel
+        self._responses_initialized.wait()
         if self._responses is not None:
             self._responses.cancel()
         self._processing_thread.join()
@@ -60,9 +63,11 @@ class ServerStreamHandler:
         logging.info(f"Start stream {self._stream_name}")
         success = False
         self._completion_event.clear()
+        self._responses_initialized.clear()
         try:
             request = self._generate_request_function()
             self._responses = self._initialize_stream_function(request)
+            self._responses_initialized.set()
             for response in self._responses:
                 self._new_response_callback(response=response)
             success = not self._responses.cancelled()

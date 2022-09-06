@@ -23,7 +23,7 @@ class SumClientServerTests
   }
 
  private:
-  SumServiceImpl service_;
+  SumServiceImpl service_{0};
   std::unique_ptr<Server> server_ptr_;
 };
 

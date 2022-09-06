@@ -62,7 +62,7 @@ std::pair<bool, std::int64_t> MaxClient::GetMax(
 
   // Receive and print out reponses while requests are being sent out
   std::this_thread::sleep_for(std::chrono::milliseconds(
-      10));  // Give some time for writer to write data before starting to read
+      50));  // Give some time for writer to write data before starting to read
   MaxResponse response;
   while (stream_ptr->Read(&response)) {
     const auto max = response.max();

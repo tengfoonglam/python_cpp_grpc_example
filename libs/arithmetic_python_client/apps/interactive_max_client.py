@@ -8,7 +8,7 @@ from arithmetic_python_client import MaxClient
 from arithmetic_python_client.utils import get_terminal_input_generator
 
 
-def interactive_average() -> None:
+def interactive_max() -> None:
 
     try:
         client = MaxClient()
@@ -36,7 +36,7 @@ def interactive_average() -> None:
 
         logging.info("Max Client successfully opened")
 
-        while (client.is_grpc_active()):
+        while client.is_grpc_active():
             numbers_to_max = []
             start_success = client.max(input_iterable=get_terminal_input_generator(
                 new_entry_callback=lambda new_entry: numbers_to_max.append(new_entry)))
@@ -55,4 +55,4 @@ def interactive_average() -> None:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    interactive_average()
+    interactive_max()
