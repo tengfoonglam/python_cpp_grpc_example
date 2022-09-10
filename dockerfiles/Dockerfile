@@ -35,7 +35,8 @@ COPY . .
 WORKDIR /libs/arithmetic_grpc/build
 SHELL ["/bin/bash", "-c"]
 RUN NPROC=1 && if [ "$(nproc)" -gt 1 ]; then NPROC="$(($(nproc) - 1))"; fi &&\
-cmake ../ && make -j$NPROC
+cmake ../ && make -j$NPROC &&\
+ctest
 
 # Copy executable to deployment image
 FROM python_cpp_grpc_base as arithmetic_server

@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: test
+name: Build and Test
 
 # Controls when the workflow will run
 on:
@@ -18,40 +18,28 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      - name: Build C++ Server
+      - name: Build and Test C++ Arithmetic Server
         run: |
           echo "Building docker images"
           ./scripts/build_docker_images.sh
-          echo test, and deploy your project.
 
-      - name: Setup Python Environment
+      - name: Run Python Client Pytest
         run: |
           echo "Setup Python Environment and Run Pytests"
+          apt-get update && apt-get install python3.8-venv --no-install-recommends -y
           source ./scripts/initialise_python_environment.sh
           cd libs/arithmetic_python_client/
-          coverage run --source=arithmetic_python_client -m pytest pytest/ && coverage report -m
-          
-      - name: Generate coverage report
-        run: |
-          cd libs/arithmetic_python_client/
-          pytest --cov=./arithmetic_python_client --cov-report=xml
-          
+          pytest --cov=./arithmetic_python_client --cov-report xml
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          directory: ./libs/arithmetic_python_client/
-          env_vars: OS,PYTHON
           fail_ci_if_error: true
-          files: ./coverage.xml
-          name: codecov-umbrella
-          path_to_write_report: ./coverage/codecov_report.txt
           verbose: true
-          
-          
