@@ -1,5 +1,7 @@
 # python_cpp_grpc_example
 
+[![Build](https://github.com/tengfoonglam/python_cpp_grpc_example/actions/workflows/main.yml/badge.svg)](https://github.com/tengfoonglam/python_cpp_grpc_example/actions/workflows/main.yml)
+[![codecov](https://codecov.io/gh/tengfoonglam/python_cpp_grpc_example/branch/main/graph/badge.svg?token=4C4ZTA1CKG)](https://codecov.io/gh/tengfoonglam/python_cpp_grpc_example)
 ---
  ***python_cpp_grpc_example*** is an example on how to create a Python-C++ interface using [gRPC](https://grpc.io/) (gRPC Remote Procedure Calls).
 
