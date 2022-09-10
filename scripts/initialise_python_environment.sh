@@ -5,11 +5,16 @@ VENV_DIR=${DIR}/../.venv
 
 pushd $DIR/..
 
-  echo "Creating virtual environment..."
-  python3 -m venv ${VENV_DIR}
+  if [[ $1 = no_venv ]]
+  then
+    echo "Installing on system Python environment"
+  else
+    echo "Creating virtual environment..."
+    python3 -m venv ${VENV_DIR}
 
-  echo "Activating virtual environment..."
-  source ${VENV_DIR}/bin/activate
+    echo "Activating virtual environment..."
+    source ${VENV_DIR}/bin/activate
+  fi
 
   echo "Installing development python packages"
   pip install -r requirements.txt

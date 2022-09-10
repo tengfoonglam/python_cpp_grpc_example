@@ -27,8 +27,13 @@ jobs:
 
       - name: Build and Test C++ Arithmetic Server
         run: |
-          echo "Building docker images"
-          ./scripts/build_docker_images.sh
+          echo "Building docker server"
+          ./scripts/build_docker_server.sh
+
+      - name: Build Python Client Image
+        run: |
+          echo "Building docker client"
+          ./scripts/build_docker_client.sh
 
       - name: Run Python Client Pytest
         run: |
