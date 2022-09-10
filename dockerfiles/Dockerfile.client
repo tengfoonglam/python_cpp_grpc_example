@@ -1,0 +1,9 @@
+FROM python:3.10.7-alpine3.16 as interactive_arithmetic_client
+
+ENV SERVICE="sum"
+# hadolint ignore=DL3018
+RUN apk add --no-cache bash
+WORKDIR /
+COPY . .
+RUN bash -c "source ./scripts/initialise_python_environment.sh no_venv"
+CMD ["sh", "-c","./scripts/launch_interactive_python_client.sh ${SERVICE}"]

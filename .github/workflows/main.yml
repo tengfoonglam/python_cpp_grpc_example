@@ -1,0 +1,50 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Build and Test
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-20.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - name: Build and Test C++ Arithmetic Server
+        run: |
+          echo "Building docker server"
+          ./scripts/build_docker_server.sh
+
+      - name: Build Python Client Image
+        run: |
+          echo "Building docker client"
+          ./scripts/build_docker_client.sh
+
+      - name: Run Python Client Pytest
+        run: |
+          echo "Setup Python Environment and Run Pytests"
+          apt-get update && apt-get install python3.8-venv --no-install-recommends -y
+          source ./scripts/initialise_python_environment.sh
+          cd libs/arithmetic_python_client/
+          pytest --cov=./arithmetic_python_client --cov-report xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: true
+          verbose: true

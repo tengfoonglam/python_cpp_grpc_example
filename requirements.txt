@@ -1,3 +1,4 @@
 # Developer Tools:
 pre-commit==2.13.0
 pytest==6.2.4
+pytest-cov==3.0.0

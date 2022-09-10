@@ -5,7 +5,7 @@
 
 The server is written in C++ while the client is in Python. Such a setup allows for performance-critical code to be written in C++ while the rest of the code is written in Python which is more productive to develop in. This is potentially very useful in robotic applications where you want your algorithms/driver code to be peformant and written in C++ but at the same time provide a user-friendly Python API for the end user.
 
-In this project, the C++ server is Dockerized while the Python client is installed in a Python virtual environment so you can run the example without any system wide installations (unless you want to).
+In this project, both the C++ server Python client have been Dockerized so you can run the example without any system wide installations. Nevertheless, steps to build/install the project locally are also provided.
 
 This repository implements the 4 different service methods offered by gRPC.
  1. **gRPC Unary - Sum service**: Request takes in 2 numbers and returns a response that contains the sum
@@ -13,13 +13,34 @@ This repository implements the 4 different service methods offered by gRPC.
  3. **gRPC Client Streaming - Average service**: A stream of requests that each contains an integer and returns a response with the average of the numbers
  4. **gRPC Bi-Directional Streaming - Max service**: A stream of requests that each contains an integer and returns a stream of responses that updates the client when the maximum of the input number stream has changed
 
- ### Building and Running C++ Arithmetic Server using Docker
+---
 
- 1. Install Docker (instructions [here](https://docs.docker.com/engine/install/ubuntu/))
- 2. Build Docker images: ```./scripts/build_docker_images.sh```
- 3. Deploy container: ```./scripts/launch_dockerized_cpp_grpc_arithmetic_server.sh```
+### Requirements
+ * Docker (Installation instructions [here](https://docs.docker.com/engine/install/ubuntu/))
 
-### Building and Running C++ Arithmetic Server from Source
+---
+
+## Docker Installation
+
+#### Building and Running C++ Arithmetic Server
+
+ 1. Build Docker images: ```./scripts/build_docker_server.sh```
+ 2. Deploy container: ```./scripts/launch_dockerized_cpp_grpc_arithmetic_server.sh```
+
+#### Setting up and Running Interactive Python Clients
+ 1. Build Docker images: ```./scripts/build_docker_client.sh```
+ 2. Launch an instance of the Arithmetic Server
+ 3. Deploy interactive Python client container to interact with server:
+      1. Average: ```./scripts/launch_dockerized_interactive_arithmetic_client.py average```
+      2. Max: ```./scripts/launch_dockerized_interactive_arithmetic_client.py max```
+      3. Prime: ```./scripts/launch_dockerized_interactive_arithmetic_client.py prime```
+      4. Sum: ```./scripts/launch_dockerized_interactive_arithmetic_client.py sum```
+
+---
+
+## Local Installation
+
+#### Building and Running C++ Arithmetic Server from Source
 
 1. Install gRPC: ```source scripts/install_grpc.sh```
 2. Build arithmetic_grpc package
@@ -35,18 +56,20 @@ This repository implements the 4 different service methods offered by gRPC.
         3. ```./apps/prime_server``` / ```./apps/interactive_prime_client```
         4. ```./apps/sum_server``` / ```./apps/interactive_sum_client```
 
-## Setting up and Running Python Clients in Python Virtual Environment
+#### Setting up and Running Interactive Python Clients in Python Virtual Environment
 
-1. Initialize Python virtual environment, pip install dependencies and arithmetic client ```./scripts/initialise_python_environment.sh```
-2. Enter arithmetic_python_client package folder ```cd libs/arithmetic_python_client/```
-3. Run Pytests (without/with verbosity):
-   1. If you have built the Docker containers: ```pytest pytest/``` / ```pytest -vvv -s --log-cli-level=INFO pytest/```
-   2. If you have built from source: ```pytest  --use-local-server pytest/``` / ```pytest -vvv -s --log-cli-level=INFO --use-local-server pytest/```
-4. **With the Arithmetic server running** you can launch the interactive Python clients:
-   1. Average: ```./apps/interactive_average_client.py```
-   2. Max: ```./apps/interactive_max_client.py```
-   3. Prime: ```./apps/interactive_prime_client.py```
-   4. Sum: ```./apps/interactive_sum_client.py```
+1. Initialize Python virtual environment, pip install dependencies and arithmetic client ```source ./scripts/initialise_python_environment.sh```
+2. Run Pytests (without/with verbosity):
+   1. Enter arithmetic_python_client package folder ```cd libs/arithmetic_python_client/```
+   2. If you have built the Docker containers: ```pytest pytest/``` / ```pytest -vvv -s --log-cli-level=INFO pytest/```
+   3. If you have built from source: ```pytest  --use-local-server pytest/``` / ```pytest -vvv -s --log-cli-level=INFO --use-local-server pytest/```
+3. **With the Arithmetic server running** you can launch the interactive Python clients. **In the git root directory**:
+   1. Average: ```./scripts/launch_interactive_python_client.py average```
+   2. Max: ```./scripts/launch_interactive_python_client.py average max```
+   3. Prime: ```./scripts/launch_interactive_python_client.py average prime```
+   4. Sum: ```./scripts/launch_interactive_python_client.py average sum```
+
+---
 
 ## Evans Universal gRPC Client
 
@@ -62,6 +85,8 @@ gRPC Server Reflection is enabled in the arithmetic server and this enables the 
       2. Call service: ```call Sum```
       3. Follow prompts from terminal to enter input
    4. Exit: ```exit```
+
+---
 
 ## Acknowledgements
 
