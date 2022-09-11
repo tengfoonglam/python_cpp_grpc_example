@@ -21,6 +21,7 @@ This repository implements the 4 different service methods offered by gRPC.
 
 #### Requirements
  * Docker (Installation instructions [here](https://docs.docker.com/engine/install/ubuntu/))
+ * For Windows: Git (Installation instructions [here](https://git-scm.com/downloads)). Required because Git Bash is needed to run the Bash scripts.
 
 #### Building and Running C++ Arithmetic Server
 
