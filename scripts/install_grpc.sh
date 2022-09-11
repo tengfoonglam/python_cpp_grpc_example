@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # This variable will be empty if running in docker env, not otherwise
-NOT_RUNNING_IN_DOCKER=$(cat /proc/1/sched | head -n 1 | grep init)
+RUNNING_IN_DOCKER=$(docker info > /dev/null 2>&1)
 
 # Only run sudo if executed locally
 SUDO=''
-if [[ -n $NOT_RUNNING_IN_DOCKER ]]; then
+if [[ -n $RUNNING_IN_DOCKER ]]; then
+    echo "Running in Docker"
+else
     echo "Not running in Docker"
     SUDO='sudo'
-else
-	echo "Running in Docker"
 fi
 
 # Run with nproc-1 unless there is only one processor
@@ -20,12 +20,11 @@ fi
 echo "Building with $NPROC processor(s)"
 
 # Set environmental variables to install gRPC (if not in docker container, install locally in .local folder)
-if [[ -n $NOT_RUNNING_IN_DOCKER ]]; then
-    MY_INSTALL_DIR=$HOME/.local
-else
+if [[ -n $RUNNING_IN_DOCKER ]]; then
     MY_INSTALL_DIR=/usr/local
+else
+    MY_INSTALL_DIR=$HOME/.local
 fi
-
 echo "gRPC install directory: ${MY_INSTALL_DIR}"
 
 mkdir -p $MY_INSTALL_DIR
