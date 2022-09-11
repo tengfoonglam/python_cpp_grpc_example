@@ -17,12 +17,10 @@ This repository implements the 4 different service methods offered by gRPC.
 
 ---
 
-### Requirements
- * Docker (Installation instructions [here](https://docs.docker.com/engine/install/ubuntu/))
-
----
-
 ## Installation using Docker (Tested on Windows 11 with PowerShell / Ubuntu 20.04 LTS)
+
+#### Requirements
+ * Docker (Installation instructions [here](https://docs.docker.com/engine/install/ubuntu/))
 
 #### Building and Running C++ Arithmetic Server
 
