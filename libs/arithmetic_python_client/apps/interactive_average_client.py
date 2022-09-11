@@ -34,7 +34,7 @@ def interactive_average() -> None:
                     new_entry_callback=lambda new_entry: numbers_to_average.append(new_entry)))
 
                 # Just to demonstrate that call is non-blocking
-                logging.info("Waiting for computation to complete...")
+                logging.info("Average gRPC call made, awaiting input...")
 
                 if future is not None:
                     answer = future.wait_for_result()
