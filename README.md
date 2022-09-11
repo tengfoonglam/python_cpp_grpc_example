@@ -26,11 +26,11 @@ This repository implements the 4 different service methods offered by gRPC.
 
 #### Building and Running C++ Arithmetic Server
 
- 1. Build Docker images: ```./scripts/build_docker_server.sh```
+ 1. Build Docker Server: ```./scripts/build_docker_server.sh```
  2. Deploy container: ```./scripts/launch_dockerized_cpp_grpc_arithmetic_server.sh```
 
 #### Setting up and Running Interactive Python Clients
- 1. Build Docker images: ```./scripts/build_docker_client.sh```
+ 1. Build Docker Client: ```./scripts/build_docker_client.sh```
  2. Launch an instance of the Arithmetic Server
  3. Deploy interactive Python client container to interact with server:
       1. Average: ```./scripts/launch_dockerized_interactive_arithmetic_client.py average```
@@ -61,11 +61,12 @@ This repository implements the 4 different service methods offered by gRPC.
 #### Setting up and Running Interactive Python Clients in Python Virtual Environment
 
 1. Initialize Python virtual environment, pip install dependencies and arithmetic client ```source ./scripts/initialise_python_environment.sh```
-2. Run Pytests (without/with verbosity):
+   * Note: If venv is not on your system, the terminal will prompt you with the command to pip install it
+3. Run Pytests (without/with verbosity):
    1. Enter arithmetic_python_client package folder ```cd libs/arithmetic_python_client/```
    2. If you have built the Docker containers: ```pytest pytest/``` / ```pytest -vvv -s --log-cli-level=INFO pytest/```
    3. If you have built from source: ```pytest  --use-local-server pytest/``` / ```pytest -vvv -s --log-cli-level=INFO --use-local-server pytest/```
-3. **With the Arithmetic server running** you can launch the interactive Python clients. **In the git root directory**:
+4. **With the Arithmetic server running** you can launch the interactive Python clients. **In the git root directory**:
    1. Average: ```./scripts/launch_interactive_python_client.py average```
    2. Max: ```./scripts/launch_interactive_python_client.py average max```
    3. Prime: ```./scripts/launch_interactive_python_client.py average prime```
