@@ -40,7 +40,7 @@ This repository implements the 4 different service methods offered by gRPC.
 
 ---
 
-## Local Installation
+## Local Installation (Tested on Ubuntu 20.04 LTS)
 
 #### Building and Running C++ Arithmetic Server from Source
 
