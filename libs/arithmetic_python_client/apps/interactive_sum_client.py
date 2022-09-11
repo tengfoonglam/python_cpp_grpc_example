@@ -34,7 +34,7 @@ def interactive_sum() -> None:
                     future = client.sum_non_blocking(number_1=number_1, number_2=number_2)
 
                     # Just to demonstrate that call is non-blocking
-                    logging.info("Waiting for computation to complete...")
+                    logging.info("Sum gRPC call made, waiting for computation to complete...")
 
                     if future is not None:
                         answer = future.wait_for_result()
