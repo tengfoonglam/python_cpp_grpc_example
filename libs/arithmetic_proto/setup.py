@@ -20,7 +20,7 @@ import_paths = ['.']
 # Note what we are doing here. We create a custom command CompileProtos and register it in setuptools.setup as 'compile_protos'
 # We then override the default install and develop commands
 # install is called when you run pip install . --> No pb2.py and pb2_grpc.py files will be generated in the source directory
-# deveop is called when you run pip install -e . --> pb2.py and pb2_grpc.py will be generated in the source directory
+# develop is called when you run pip install -e . --> pb2.py and pb2_grpc.py will be generated in the source directory
 
 
 class InstallCommand(install):
