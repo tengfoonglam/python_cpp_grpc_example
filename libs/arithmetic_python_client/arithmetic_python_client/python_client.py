@@ -41,7 +41,8 @@ class PythonClient(Generic[T]):
         logging.info(f"gRPC stub creation {'successful' if self._channel else 'unsuccessful'}")
         return self._channel_and_stubs_initialized()
 
-    def _create_connect_channel(self, address_with_port: str) -> Optional[grpc.Channel]:
+    @staticmethod
+    def _create_connect_channel(address_with_port: str, timeout: float = 5.0) -> Optional[grpc.Channel]:
 
         try:
             channel = grpc.insecure_channel(target=address_with_port)
@@ -50,15 +51,20 @@ class PythonClient(Generic[T]):
             return None
 
         try:
-            grpc.channel_ready_future(channel).result(timeout=5)
+            future = grpc.channel_ready_future(channel)
+            future.result(timeout=timeout)
         except grpc.FutureTimeoutError:
             logging.error("Connection to gRPC server timed out")
-            return None
-        except Exception as e:
-            logging.error(f"Could not connect to the gRPC-Server. Error: {e}")
-            return None
+        except Exception:
+            logging.error("Could not connect to the gRPC-Server.", exc_info=True)
 
-        return channel
+        if future.done():
+            return channel
+        else:
+            future.cancel()
+            channel.close()
+            logging.error("Failed to create a connected channel")
+            return None
 
     def close(self) -> bool:
 
@@ -85,10 +91,16 @@ class PythonClient(Generic[T]):
             return False
         active = False
         try:
-            grpc.channel_ready_future(self._channel).result(timeout=0.5)
+            future = grpc.channel_ready_future(self._channel)
+            future.result(timeout=0.5)
             active = True
         except grpc.FutureTimeoutError:
+            future.cancel()
             logging.error("gRPC connection lost. channel_ready_future timed out")
         except Exception:
             logging.exception("gRPC connection lost")
+
+        if not future.done():
+            future.cancel()
+
         return active
