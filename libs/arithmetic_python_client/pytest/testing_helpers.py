@@ -1,5 +1,6 @@
 import docker
 import subprocess
+import time
 
 from arithmetic_python_client import MaxClient, PerformPrimeNumberDecompositionClient
 
@@ -22,3 +23,4 @@ class ArithmeticServerProcess:
         except docker.errors.APIError:
             # Handle case where docker container is used and already killed during pytest
             pass
+        time.sleep(0.2)    # Provide some time for kill to be processed

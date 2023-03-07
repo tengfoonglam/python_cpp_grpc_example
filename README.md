@@ -63,7 +63,7 @@ This repository implements the 4 different service methods offered by gRPC.
    * Note: If venv is not on your system, the terminal will prompt you with the command to pip install it
 3. Run Pytests (without/with verbosity):
    1. Enter arithmetic_python_client package folder ```cd libs/arithmetic_python_client/```
-   2. If you have built the Docker containers: ```pytest pytest/``` / ```pytest -vvv -s --log-cli-level=INFO pytest/```
+   2. **Recommended** - If you have built the Docker containers: ```pytest pytest/``` / ```pytest -vvv -s --log-cli-level=INFO pytest/```
    3. If you have built from source: ```pytest  --use-local-server pytest/``` / ```pytest -vvv -s --log-cli-level=INFO --use-local-server pytest/```
 4. **With the Arithmetic server running** you can launch the interactive Python clients. **In the git root directory**:
    1. Average: ```./scripts/launch_interactive_python_client.py average```

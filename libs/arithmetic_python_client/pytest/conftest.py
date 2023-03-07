@@ -3,6 +3,8 @@ import logging
 import pytest
 import _pytest
 import subprocess
+import threading
+import time
 
 from testing_helpers import ArithmeticServerProcess, ConfiguredMaxClient, ConfiguredPrimeClient, IntGenerator
 
@@ -175,3 +177,20 @@ def open_sum_client(request: pytest.FixtureRequest) -> SumClient:
     request.addfinalizer(cleanup)
 
     return client
+
+
+@pytest.fixture(autouse=True)
+def ensure_no_stray_threads(request: pytest.FixtureRequest) -> None:
+    def cleanup() -> None:
+        cleanup_success = False
+        # It takes a while for channels and corresponding threads to be cleared by the garbage collector
+        # This is because channel state is updated/polled every 0.2 seconds
+        # Hence we retry a few times to cater for this
+        # Refer to _channel.py file in the gRPC source code for more details
+        for _ in range(3):
+            thread_list = threading.enumerate()
+            cleanup_success = (len(thread_list) == 1 and thread_list[0].name == "MainThread")
+            time.sleep(0.2)
+        assert cleanup_success
+
+    request.addfinalizer(cleanup)
