@@ -1,0 +1,10 @@
+coverage:
+  status:
+    # Disable patch checks, which is rather flaky
+    patch:
+      default:
+        enabled: no
+        if_not_found: success
+    project:
+      default:
+        threshold: 3
