@@ -3,6 +3,7 @@
 import logging
 import os
 import sys
+import time
 
 from arithmetic_python_client import PerformPrimeNumberDecompositionClient
 from arithmetic_python_client.utils import get_int_input_from_terminal
@@ -10,18 +11,18 @@ from arithmetic_python_client.utils import get_int_input_from_terminal
 
 def interactive_prime() -> None:
 
+    RECEIVING_DELAY = 3.0
+
     try:
         client = PerformPrimeNumberDecompositionClient()
 
-        answer = []
-
         def on_receive(factor: int) -> None:
-            logging.info(f"Received number: {factor}")
-            answer.append(factor)
+            logging.info(f"Current delay [ms]: {(time.time_ns()-factor) * 1e-6}")
+            time.sleep(RECEIVING_DELAY)
 
         def on_completion(success: bool) -> None:
             if success:
-                logging.info(f"Answer: {answer}")
+                logging.info("Compeleted stream")
             else:
                 logging.warning("Failed to compute answer")
 
@@ -36,7 +37,6 @@ def interactive_prime() -> None:
         logging.info("Prime Client successfully opened")
 
         while client.is_grpc_active():
-            answer.clear()
             number = get_int_input_from_terminal(display_message="Number to perform prime number decomposition: ")
 
             if number is None:

@@ -19,7 +19,7 @@ class PerformPrimeNumberDecompositionServiceImpl final
     : public PerformPrimeNumberDecompositionService::Service {
  public:
   PerformPrimeNumberDecompositionServiceImpl(
-      std::uint64_t simulated_processing_time_ms = 200);
+      std::uint64_t simulated_processing_time_ms = 1000);
 
   Status PerformPrimeNumberDecomposition(
       __attribute__((unused)) ServerContext* context_ptr,
